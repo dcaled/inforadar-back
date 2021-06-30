@@ -113,6 +113,7 @@ class Indicators(Resource):
         new_indicators = dict()
         for indicator_id in data.get("indicators"):
             if indicator_id not in indicators.keys():
+                #TODO:
                 # indicator_instance = instantiate_metric(indicator)
                 # score = indicator_instance.compute_score(article)
                 score = random.uniform(0, 1)

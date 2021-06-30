@@ -115,6 +115,7 @@ class Metrics(Resource):
         new_metrics = dict()
         for metric_id in data.get("metrics"):
             if metric_id not in metrics.keys():
+                #TODO:
                 # metric_instance = instantiate_metric(metric)
                 # score = metric_instance.compute_score(article)
                 score = random.uniform(0, 1)
@@ -155,12 +156,3 @@ class Metrics(Resource):
                     metrics[metric_id]["percentiles"]["categories"][category_id] = 0.0
 
         return metrics, 200
-
-"""
-{
-"url": "https://meu-primeiro-artigo.pt",
-"headline": "Meu primeiro artigo",
-"body_text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sollicitudin dapibus lectus eget iaculis. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Curabitur consectetur malesuada ante, at posuere erat molestie vulputate. Aliquam nec ex purus. Morbi interdum ipsum vel ex iaculis feugiat. Donec facilisis tellus vel sollicitudin pellentesque. Suspendisse non pharetra urna, convallis vehicula neque. Mauris eu justo ultricies, sodales diam pellentesque, feugiat magna. Proin laoreet ornare aliquet. Sed vehicula vel dui id commodo. Quisque in enim scelerisque, consequat purus et, varius dolor. Integer magna metus, suscipit ac ipsum at, egestas placerat nibh. Fusce ac dolor ipsum.",
-"metrics": [1,2]
-}
-"""
