@@ -1,5 +1,3 @@
-from sqlalchemy import Index
-
 from inforadar.config import db, ma
 
 
@@ -116,6 +114,7 @@ class CrowdsourcedMetricScoreSchema(ma.SQLAlchemyAutoSchema):
         model = CrowdsourcedMetricScore
         load_instance = True
 
+
 class CrowdsourcedIndicatorScore(db.Model):
     __tablename__ = "crowdsourced_indicators_scores"
     id = db.Column(db.Integer, primary_key=True)
@@ -132,17 +131,20 @@ class CrowdsourcedIndicatorScoreSchema(ma.SQLAlchemyAutoSchema):
         model = CrowdsourcedIndicatorScore
         load_instance = True
 
+
 # TODO: rever.
 class CorpusArticle(db.Model):
     __tablename__ = "corpus_articles"
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
 
+
 # TODO: rever.
 class CorpusArticleSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = CorpusArticle
         load_instance = True
+
 
 # TODO: rever.
 class CorpusMetricScore(db.Model):
@@ -154,6 +156,7 @@ class CorpusMetricScore(db.Model):
     __table_args__ = (
         db.UniqueConstraint('corpus_article_id', 'metric_id'),
     )
+
 
 # TODO: rever.
 class CorpusMetricScoreSchema(ma.SQLAlchemyAutoSchema):
@@ -172,6 +175,7 @@ class CorpusIndicatorScore(db.Model):
     __table_args__ = (
         db.UniqueConstraint('corpus_article_id', 'indicator_id'),
     )
+
 
 # TODO: rever.
 class CorpusIndicatorScoreSchema(ma.SQLAlchemyAutoSchema):

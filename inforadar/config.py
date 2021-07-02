@@ -1,9 +1,8 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_sqlalchemy import SQLAlchemy
 
 import inforadar.db_data as db_data
-
 
 app = Flask(__name__)
 # Configure the SqlAlchemy part of the app instance

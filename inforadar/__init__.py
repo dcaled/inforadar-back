@@ -1,14 +1,10 @@
-from flask import Flask
-
 from flask_restful import Api
 
 from inforadar.config import app
-
 from inforadar.endpoints.indicators import Indicators
 from inforadar.endpoints.metadata import Metadata
 from inforadar.endpoints.metrics import Metrics
 from inforadar.endpoints.scrapper import Scraper
-
 
 api = Api(app)
 

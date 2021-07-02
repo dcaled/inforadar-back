@@ -1,12 +1,12 @@
 import random
 
+from cerberus import Validator
 from flask import request
 from flask_restful import Resource
-from cerberus import Validator
 
+import inforadar.config as config
 from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
-import inforadar.config as config
 
 
 class Metrics(Resource):
@@ -115,7 +115,7 @@ class Metrics(Resource):
         new_metrics = dict()
         for metric_id in data.get("metrics"):
             if metric_id not in metrics.keys():
-                #TODO:
+                # TODO:
                 # metric_instance = instantiate_metric(metric)
                 # score = metric_instance.compute_score(article)
                 score = random.uniform(0, 1)

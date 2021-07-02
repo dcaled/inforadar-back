@@ -4,9 +4,9 @@ from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
+import inforadar.config as config
 from inforadar.models import Category, Indicator, CorpusIndicatorQuartile, \
     CrowdsourcedArticle, CrowdsourcedIndicatorScore, IndicatorPercentile, CorpusIndicatorScore
-import inforadar.config as config
 
 
 class Indicators(Resource):
@@ -36,10 +36,10 @@ class Indicators(Resource):
                     "categories_quartiles": dict()
                 }
             indicators[record.indicator_id]["categories_quartiles"][record.category_id] = {
-                    "category_name": record.category_name,
-                    "first_quartile": record.first_quartile,
-                    "second_quartile": record.second_quartile,
-                    "third_quartile": record.third_quartile
+                "category_name": record.category_name,
+                "first_quartile": record.first_quartile,
+                "second_quartile": record.second_quartile,
+                "third_quartile": record.third_quartile
             }
         indicators = list(indicators.values())
         return indicators, 200
@@ -97,11 +97,11 @@ class Indicators(Resource):
             article = CrowdsourcedArticle.query.filter_by(id=data["id"]).first()
 
             indicators_records = CrowdsourcedArticle.query \
-                    .join(CrowdsourcedIndicatorScore,
-                          CrowdsourcedIndicatorScore.crowdsourced_article_id == CrowdsourcedArticle.id) \
-                    .add_columns(CrowdsourcedIndicatorScore.indicator_id, CrowdsourcedIndicatorScore.score) \
-                    .filter(CrowdsourcedArticle.id == article.id) \
-                    .filter(CrowdsourcedIndicatorScore.indicator_id.in_(data["indicators"])).all()
+                .join(CrowdsourcedIndicatorScore,
+                      CrowdsourcedIndicatorScore.crowdsourced_article_id == CrowdsourcedArticle.id) \
+                .add_columns(CrowdsourcedIndicatorScore.indicator_id, CrowdsourcedIndicatorScore.score) \
+                .filter(CrowdsourcedArticle.id == article.id) \
+                .filter(CrowdsourcedIndicatorScore.indicator_id.in_(data["indicators"])).all()
 
             for record in indicators_records:
                 indicators[record.indicator_id] = {"score": record.score}
@@ -113,7 +113,7 @@ class Indicators(Resource):
         new_indicators = dict()
         for indicator_id in data.get("indicators"):
             if indicator_id not in indicators.keys():
-                #TODO:
+                # TODO:
                 # indicator_instance = instantiate_metric(indicator)
                 # score = indicator_instance.compute_score(article)
                 score = random.uniform(0, 1)
@@ -139,10 +139,11 @@ class Indicators(Resource):
             for category_id in categories:
 
                 indicators_records = IndicatorPercentile.query \
-                    .join(CorpusIndicatorScore, CorpusIndicatorScore.id == IndicatorPercentile.corpus_indicator_score_id) \
-                    .add_columns(IndicatorPercentile.percentile)\
+                    .join(CorpusIndicatorScore,
+                          CorpusIndicatorScore.id == IndicatorPercentile.corpus_indicator_score_id) \
+                    .add_columns(IndicatorPercentile.percentile) \
                     .filter(IndicatorPercentile.indicator_id == indicator_id) \
-                    .filter(IndicatorPercentile.category_id == category_id)\
+                    .filter(IndicatorPercentile.category_id == category_id) \
                     .filter(CorpusIndicatorScore.score <= indicators[indicator_id]["score"]) \
                     .order_by(CorpusIndicatorScore.score.desc()) \
                     .first()

@@ -20,7 +20,7 @@ class Scraper(Resource):
         if not request.data:
             return {'message': f"Missing a JSON body in the request."}, 422
 
-        schema = {'url': {'type': 'string', 'required': True},}
+        schema = {'url': {'type': 'string', 'required': True}, }
 
         validator = Validator(schema)
         validator.validate(request.get_json(force=True))
@@ -49,4 +49,3 @@ class Scraper(Resource):
             "body_text": article.body_text,
         }
         return article, 200
-
