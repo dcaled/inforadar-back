@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
-import db_data
+import inforadar.db_data as db_data
 
 
 app = Flask(__name__)

@@ -4,9 +4,9 @@ from flask import request
 from flask_restful import Resource
 from cerberus import Validator
 
-from models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
+from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
-import config as config
+import inforadar.config as config
 
 
 class Metrics(Resource):

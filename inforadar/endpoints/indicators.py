@@ -4,9 +4,9 @@ from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
-from models import Category, Indicator, CorpusIndicatorQuartile, \
+from inforadar.models import Category, Indicator, CorpusIndicatorQuartile, \
     CrowdsourcedArticle, CrowdsourcedIndicatorScore, IndicatorPercentile, CorpusIndicatorScore
-import config as config
+import inforadar.config as config
 
 
 class Indicators(Resource):

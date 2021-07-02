@@ -2,8 +2,8 @@ from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
-import config as config
-from models import CrowdsourcedArticle
+import inforadar.config as config
+from inforadar.models import CrowdsourcedArticle
 
 
 class Scraper(Resource):

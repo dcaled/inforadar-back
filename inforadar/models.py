@@ -1,6 +1,6 @@
 from sqlalchemy import Index
 
-from config import db, ma
+from inforadar.config import db, ma
 
 
 class Category(db.Model):

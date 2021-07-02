@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from models import CategorySchema, Category
+from inforadar.models import CategorySchema, Category
 
 
 class Metadata(Resource):
