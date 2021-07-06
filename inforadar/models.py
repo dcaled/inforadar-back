@@ -87,6 +87,7 @@ class CrowdsourcedArticle(db.Model):
     url = db.Column(db.String(255), unique=True, nullable=False)
     headline = db.Column(db.String(255), nullable=False)
     body_text = db.Column(db.Text, nullable=False)
+    top_image = db.Column(db.String(255), nullable=True)
     source = db.Column(db.String(50), nullable=True)
     publish_date = db.Column(db.DateTime, nullable=True)
     creation_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=True)
