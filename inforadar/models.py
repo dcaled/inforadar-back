@@ -120,9 +120,10 @@ class CrowdsourcedIndicatorScore(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     indicator_id = db.Column(db.Integer, db.ForeignKey('indicators.id'), nullable=False)
     crowdsourced_article_id = db.Column(db.Integer, db.ForeignKey('crowdsourced_articles.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     score = db.Column(db.Float, nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('indicator_id', 'crowdsourced_article_id'),
+        db.UniqueConstraint('indicator_id', 'crowdsourced_article_id', 'category_id'),
     )
 
 

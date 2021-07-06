@@ -95,17 +95,24 @@ class Indicators(Resource):
         if data.get("id", None):
             # indicators_records = Category.query.with_entities(Metric.id, Metric.name).all()
             article = CrowdsourcedArticle.query.filter_by(id=data["id"]).first()
+            article_id = article.id
+            if not article:
+                return {'message': f"Invalid article id: " + str(data["id"]) + "."}, 400
 
             indicators_records = CrowdsourcedArticle.query \
                 .join(CrowdsourcedIndicatorScore,
                       CrowdsourcedIndicatorScore.crowdsourced_article_id == CrowdsourcedArticle.id) \
-                .add_columns(CrowdsourcedIndicatorScore.indicator_id, CrowdsourcedIndicatorScore.score) \
+                .add_columns(CrowdsourcedIndicatorScore.indicator_id,
+                             CrowdsourcedIndicatorScore.category_id,
+                             CrowdsourcedIndicatorScore.score) \
                 .filter(CrowdsourcedArticle.id == article.id) \
                 .filter(CrowdsourcedIndicatorScore.indicator_id.in_(data["indicators"])).all()
 
             for record in indicators_records:
-                indicators[record.indicator_id] = {"score": record.score}
-            article_id = article.id
+                if record.indicator_id in indicators:
+                    indicators[record.indicator_id]['categories'][record.category_id] = {"score": record.score}
+                else:
+                    indicators[record.indicator_id] = {'categories': {record.category_id: {"score": record.score}}}
 
         # --------------------------
         # Compute score for each indicator.
@@ -113,11 +120,13 @@ class Indicators(Resource):
         new_indicators = dict()
         for indicator_id in data.get("indicators"):
             if indicator_id not in indicators.keys():
-                # TODO:
-                # indicator_instance = instantiate_metric(indicator)
-                # score = indicator_instance.compute_score(article)
-                score = random.uniform(0, 1)
-                new_indicators[indicator_id] = {"score": score}
+                new_indicators[indicator_id] = {'categories': dict()}
+                for category_id in categories:
+                    # TODO:
+                    # indicator_instance = instantiate_metric(indicator)
+                    # score = indicator_instance.compute_score(article)
+                    score = random.uniform(0, 1)
+                    new_indicators[indicator_id]['categories'][category_id] = {"score": score}
         indicators.update(new_indicators)
 
         # --------------------------
@@ -125,32 +134,33 @@ class Indicators(Resource):
         # --------------------------
         if article_id:
             for indicator_id in new_indicators.keys():
-                indicator_score = CrowdsourcedIndicatorScore(indicator_id=indicator_id,
-                                                             crowdsourced_article_id=article_id,
-                                                             score=new_indicators[indicator_id]["score"])
-                config.db.session.add(indicator_score)
+                for category_id in categories:
+                    indicator_score = CrowdsourcedIndicatorScore(
+                        indicator_id=indicator_id,
+                        category_id=category_id,
+                        crowdsourced_article_id=article_id,
+                        score=new_indicators[indicator_id]['categories'][category_id]["score"])
+                    config.db.session.add(indicator_score)
             config.db.session.commit()
 
         # --------------------------
         # Get percentiles.
         # --------------------------
         for indicator_id in indicators.keys():
-            indicators[indicator_id]["percentiles"] = {"categories": dict()}
             for category_id in categories:
-
                 indicators_records = IndicatorPercentile.query \
                     .join(CorpusIndicatorScore,
                           CorpusIndicatorScore.id == IndicatorPercentile.corpus_indicator_score_id) \
                     .add_columns(IndicatorPercentile.percentile) \
                     .filter(IndicatorPercentile.indicator_id == indicator_id) \
                     .filter(IndicatorPercentile.category_id == category_id) \
-                    .filter(CorpusIndicatorScore.score <= indicators[indicator_id]["score"]) \
+                    .filter(CorpusIndicatorScore.score <= indicators[indicator_id]['categories'][category_id]["score"]) \
                     .order_by(CorpusIndicatorScore.score.desc()) \
                     .first()
 
                 if indicators_records:
-                    indicators[indicator_id]["percentiles"]["categories"][category_id] = indicators_records.percentile
+                    indicators[indicator_id]['categories'][category_id]["percentile"] = indicators_records.percentile
                 else:
-                    indicators[indicator_id]["percentiles"]["categories"][category_id] = 0.0
+                    indicators[indicator_id]['categories'][category_id]["percentile"] = 0.0
 
         return indicators, 200
