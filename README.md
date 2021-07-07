@@ -19,3 +19,7 @@ Python version used: 3.9
     (Windows) set FLASK_APP=inforadar
     (Linux) export FLASK_APP=inforadar
     flask run
+
+## To upgrade on the server:
+    git pull
+    sudo systemctl restart inforadarapi.service 
