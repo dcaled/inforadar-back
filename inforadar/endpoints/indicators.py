@@ -21,7 +21,7 @@ class Indicators(Resource):
             .join(Category, Category.id == CorpusIndicatorQuartile.category_id) \
             .add_columns(Indicator.id.label("indicator_id"), Indicator.name.label("indicator_name"),
                          Indicator.display_name, Indicator.description,
-                         Category.id.label("category_id"), Category.name.label("category_name"),
+                         Category.id.label("category_id"), Category.name.label("category_name"), Category.display_name,
                          CorpusIndicatorQuartile.first_quartile, CorpusIndicatorQuartile.second_quartile,
                          CorpusIndicatorQuartile.third_quartile).all()
 
@@ -33,14 +33,16 @@ class Indicators(Resource):
                     "name": record.indicator_name,
                     "display_name": record.display_name,
                     "description": record.description,
-                    "categories_quartiles": dict()
+                    "categories": []
                 }
-            indicators[record.indicator_id]["categories_quartiles"][record.category_id] = {
-                "category_name": record.category_name,
+            indicators[record.indicator_id]["categories"] += [{
+                "id": record.category_id,
+                "name": record.category_name,
+                "display_name": record.display_name,
                 "first_quartile": record.first_quartile,
                 "second_quartile": record.second_quartile,
                 "third_quartile": record.third_quartile
-            }
+            }]
         indicators = list(indicators.values())
         return indicators, 200
 
