@@ -1,10 +1,9 @@
-import random
-
 from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
 import inforadar.config as config
+from inforadar.classify.classify import classify_text
 from inforadar.models import Category, Indicator, CorpusIndicatorQuartile, \
     CrowdsourcedArticle, CrowdsourcedIndicatorScore, IndicatorPercentile, CorpusIndicatorScore
 
@@ -97,9 +96,10 @@ class Indicators(Resource):
         if data.get("id", None):
             # indicators_records = Category.query.with_entities(Metric.id, Metric.name).all()
             article = CrowdsourcedArticle.query.filter_by(id=data["id"]).first()
-            article_id = article.id
             if not article:
                 return {'message': f"Invalid article id: " + str(data["id"]) + "."}, 400
+            article_id = article.id
+            body_text = article.body_text
 
             indicators_records = CrowdsourcedArticle.query \
                 .join(CrowdsourcedIndicatorScore,
@@ -115,6 +115,8 @@ class Indicators(Resource):
                     indicators[record.indicator_id]['categories'][record.category_id] = {"score": record.score}
                 else:
                     indicators[record.indicator_id] = {'categories': {record.category_id: {"score": record.score}}}
+        else:
+            body_text = data.get("body_text", None)
 
         # --------------------------
         # Compute score for each indicator.
@@ -122,13 +124,8 @@ class Indicators(Resource):
         new_indicators = dict()
         for indicator_id in data.get("indicators"):
             if indicator_id not in indicators.keys():
-                new_indicators[indicator_id] = {'categories': dict()}
-                for category_id in categories:
-                    # TODO:
-                    # indicator_instance = instantiate_metric(indicator)
-                    # score = indicator_instance.compute_score(article)
-                    score = random.uniform(0, 1)
-                    new_indicators[indicator_id]['categories'][category_id] = {"score": score}
+                scores = classify_text(body_text)
+                new_indicators[indicator_id] = scores
         indicators.update(new_indicators)
 
         # --------------------------
