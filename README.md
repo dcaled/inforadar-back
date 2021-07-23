@@ -12,7 +12,9 @@ Python version used: 3.9
 * conda install -c conda-forge flask-marshmallow
 * conda install marshmallow-sqlalchemy
 * conda install -c conda-forge flup
-* conda install -c conda-forge newspaper3k 
+* conda install -c conda-forge newspaper3k
+* conda install pytorch torchvision torchaudio cpuonly -c pytorch
+* conda install -c conda-forge transformers
 
 ## To run:
     pip install -e .
