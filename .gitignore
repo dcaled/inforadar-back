@@ -145,3 +145,4 @@ dmypy.json
 cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+/inforadar/classify/best_model_state_text.bin
