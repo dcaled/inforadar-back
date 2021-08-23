@@ -1,3 +1,5 @@
+import sys
+
 from cerberus import Validator
 from flask import request
 from flask_restful import Resource
@@ -45,11 +47,13 @@ class Scraper(Resource):
                 article.download()
                 article.parse()
 
-                if article.title != "" and article.text != "":
+                if article.title == "" or article.text == "":
+                    return {'message': f"Failed to scrape article (unable to retrieve headline or body text): " +\
+                                       str(data["url"])}, 500
+                else:
+                    publish_date = None
                     if article.publish_date:
                         publish_date = article.publish_date.strftime('%Y-%m-%d %H:%M:%S')
-                    else:
-                        publish_date = None
 
                     crowdsourced_article = CrowdsourcedArticle(
                         headline=article.title,
