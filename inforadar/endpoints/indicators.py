@@ -5,7 +5,7 @@ from flask_restful import Resource
 import inforadar.config as config
 from inforadar.classify.classify import classify_text
 from inforadar.models import Category, Indicator, CorpusIndicatorQuartile, \
-    CrowdsourcedArticle, CrowdsourcedIndicatorScore, IndicatorPercentile, CorpusIndicatorScore
+    CrowdsourcedArticle, CrowdsourcedIndicatorScore, IndicatorPercentile, CorpusIndicatorScore, IndicatorSchema
 
 
 class Indicators(Resource):
@@ -15,35 +15,43 @@ class Indicators(Resource):
         (fact, opinion, conspiracy, entertainment, and satire).
         """
 
-        records = CorpusIndicatorQuartile.query \
-            .join(Indicator, Indicator.id == CorpusIndicatorQuartile.indicator_id) \
-            .join(Category, Category.id == CorpusIndicatorQuartile.category_id) \
-            .add_columns(Indicator.id.label("indicator_id"), Indicator.name.label("indicator_name"),
-                         Indicator.display_name, Indicator.description,
-                         Category.id.label("category_id"), Category.name.label("category_name"), Category.display_name,
-                         CorpusIndicatorQuartile.first_quartile, CorpusIndicatorQuartile.second_quartile,
-                         CorpusIndicatorQuartile.third_quartile).all()
+        # If we decide to use quartiles to present indicators, uncomment this code below.
+        # records = CorpusIndicatorQuartile.query \
+        #     .join(Indicator, Indicator.id == CorpusIndicatorQuartile.indicator_id) \
+        #     .join(Category, Category.id == CorpusIndicatorQuartile.category_id) \
+        #     .add_columns(Indicator.id.label("indicator_id"), Indicator.name.label("indicator_name"),
+        #                  Indicator.display_name, Indicator.description,
+        #                  Category.id.label("category_id"), Category.name.label("category_name"), Category.display_name,
+        #                  CorpusIndicatorQuartile.first_quartile, CorpusIndicatorQuartile.second_quartile,
+        #                  CorpusIndicatorQuartile.third_quartile).all()
+        #
+        # indicators = dict()
+        # for record in records:
+        #     if record.indicator_id not in indicators:
+        #         indicators[record.indicator_id] = {
+        #             "id": record.indicator_id,
+        #             "name": record.indicator_name,
+        #             "display_name": record.display_name,
+        #             "description": record.description,
+        #             "categories": []
+        #         }
+        #     indicators[record.indicator_id]["categories"] += [{
+        #         "id": record.category_id,
+        #         "name": record.category_name,
+        #         "display_name": record.display_name,
+        #         "first_quartile": record.first_quartile,
+        #         "second_quartile": record.second_quartile,
+        #         "third_quartile": record.third_quartile
+        #     }]
 
-        indicators = dict()
-        for record in records:
-            if record.indicator_id not in indicators:
-                indicators[record.indicator_id] = {
-                    "id": record.indicator_id,
-                    "name": record.indicator_name,
-                    "display_name": record.display_name,
-                    "description": record.description,
-                    "categories": []
-                }
-            indicators[record.indicator_id]["categories"] += [{
-                "id": record.category_id,
-                "name": record.category_name,
-                "display_name": record.display_name,
-                "first_quartile": record.first_quartile,
-                "second_quartile": record.second_quartile,
-                "third_quartile": record.third_quartile
-            }]
-        indicators = list(indicators.values())
-        return indicators, 200
+        # Create the list of indicators from our data.
+        indicator = Indicator.query.all()
+
+        # Serialize the data for the response
+        indicator_schema = IndicatorSchema(many=True)
+        indicator_data = indicator_schema.dump(indicator)
+
+        return indicator_data, 200
 
     def post(self):
         """
@@ -144,22 +152,23 @@ class Indicators(Resource):
 
         # --------------------------
         # Get percentiles.
+        # If we decide to use quartiles to present indicators, uncomment this code below.
         # --------------------------
-        for indicator_id in indicators.keys():
-            for category_id in categories:
-                indicators_records = IndicatorPercentile.query \
-                    .join(CorpusIndicatorScore,
-                          CorpusIndicatorScore.id == IndicatorPercentile.corpus_indicator_score_id) \
-                    .add_columns(IndicatorPercentile.percentile) \
-                    .filter(IndicatorPercentile.indicator_id == indicator_id) \
-                    .filter(IndicatorPercentile.category_id == category_id) \
-                    .filter(CorpusIndicatorScore.score <= indicators[indicator_id]['categories'][category_id]["score"]) \
-                    .order_by(CorpusIndicatorScore.score.desc()) \
-                    .first()
-
-                if indicators_records:
-                    indicators[indicator_id]['categories'][category_id]["percentile"] = indicators_records.percentile
-                else:
-                    indicators[indicator_id]['categories'][category_id]["percentile"] = 0.0
+        # for indicator_id in indicators.keys():
+        #     for category_id in categories:
+        #         indicators_records = IndicatorPercentile.query \
+        #             .join(CorpusIndicatorScore,
+        #                   CorpusIndicatorScore.id == IndicatorPercentile.corpus_indicator_score_id) \
+        #             .add_columns(IndicatorPercentile.percentile) \
+        #             .filter(IndicatorPercentile.indicator_id == indicator_id) \
+        #             .filter(IndicatorPercentile.category_id == category_id) \
+        #             .filter(CorpusIndicatorScore.score <= indicators[indicator_id]['categories'][category_id]["score"]) \
+        #             .order_by(CorpusIndicatorScore.score.desc()) \
+        #             .first()
+        #
+        #         if indicators_records:
+        #             indicators[indicator_id]['categories'][category_id]["percentile"] = indicators_records.percentile
+        #         else:
+        #             indicators[indicator_id]['categories'][category_id]["percentile"] = 0.0
 
         return indicators, 200
