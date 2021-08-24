@@ -1,4 +1,5 @@
 # InfoRadar
+InfoRadar - REST API.
 
 ## Dependencies
 Python version used: 3.9
