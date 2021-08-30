@@ -1,10 +1,14 @@
 import random
+import sys
 
 from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
 import inforadar.config as config
+from inforadar import constants
+from inforadar.article import Article
+from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
 from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
 
@@ -100,6 +104,11 @@ class Metrics(Resource):
         if data.get("id", None):
             # metrics_records = Category.query.with_entities(Metric.id, Metric.name).all()
             article = CrowdsourcedArticle.query.filter_by(id=data["id"]).first()
+            if not article:
+                return {'message': f"Invalid article id: " + str(data["id"]) + "."}, 400
+            article_id = article.id
+            headline = article.headline
+            body_text = article.body_text
 
             metrics_records = CrowdsourcedArticle.query \
                 .join(CrowdsourcedMetricScore,
@@ -112,17 +121,31 @@ class Metrics(Resource):
                 metrics[record.metric_id] = {"score": record.score}
             article_id = article.id
 
+        else:
+            headline = data.get("headline", None)
+            body_text = data.get("body_text", None)
+
         # --------------------------
         # Compute score for each metric.
         # --------------------------
         new_metrics = dict()
         for metric_id in data.get("metrics"):
             if metric_id not in metrics.keys():
-                # TODO:
-                # metric_instance = instantiate_metric(metric)
-                # score = metric_instance.compute_score(article)
-                score = random.uniform(0, 1)
+
+                art = Article(headline, body_text, n_grams=1)
+                content = art.headline_as_list + art.body_as_list
+
+                if available_metrics[metric_id] == 'sentiment':
+                    sentiment_metric = SentimentMetric()
+                    sentiment_metric.load_lexicon(constants.fp_lex_sent)
+                    score = sentiment_metric.compute_metric(text_as_list=content)
+                else:
+                    # TODO:
+                    # metric_instance = instantiate_metric(metric)
+                    # score = metric_instance.compute_score(article)
+                    score = random.uniform(0, 1)
                 new_metrics[metric_id] = {"score": score}
+
         metrics.update(new_metrics)
 
         # --------------------------
