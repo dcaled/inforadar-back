@@ -24,7 +24,7 @@ class Metrics(Resource):
             .join(Metric, Metric.id == CorpusMetricQuartile.metric_id) \
             .join(Category, Category.id == CorpusMetricQuartile.category_id) \
             .add_columns(Metric.id.label("metric_id"), Metric.name.label("metric_name"),
-                         Metric.display_name, Metric.description,
+                         Metric.display_name.label("metric_display_name"), Metric.description,
                          Category.id.label("category_id"), Category.name.label("category_name"), Category.display_name,
                          CorpusMetricQuartile.first_quartile, CorpusMetricQuartile.second_quartile,
                          CorpusMetricQuartile.third_quartile).all()
@@ -35,7 +35,7 @@ class Metrics(Resource):
                 metrics[record.metric_id] = {
                     "id": record.metric_id,
                     "name": record.metric_name,
-                    "display_name": record.display_name,
+                    "display_name": record.metric_display_name,
                     "description": record.description,
                     "categories": []
                 }
