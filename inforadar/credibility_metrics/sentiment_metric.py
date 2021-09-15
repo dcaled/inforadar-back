@@ -78,29 +78,24 @@ class SentimentMetric(Metric):
                 info = line.lower().split('.')
                 terms = [term.strip() for term in info[0].split(',')]
                 for term in terms:
-                    term = self.replace_spaces(term.lower().strip())
+                    term = self.replace_spaces(term)
                     clex = info[1].split(';')
                     if len(clex) > 0:
                         sent0 = [int(k.replace('pol:n0=', '')) for k in clex if 'pol:n0=' in k]
                         sent1 = [int(k.replace('pol:n1=', '')) for k in clex if 'pol:n1=' in k]
 
-                        # sent1 = []
-                        if len(sent0) == 1 and sent1 == []:
+                        # Ignore terms with no n0 (sent0 = []).
+                        if not sent0:
+                            pass
+                        # If not n1, assign n0 polarity.
+                        elif len(sent0) == 1 and sent1 == []:
                             lex = self.__assign_polarity(sent0[0], term, lex)
-                        # sent0 = []
-                        elif sent0 == [] and len(sent1) == 1:
-                            lex = self.__assign_polarity(sent1[0], term, lex)
+                        # If equal polarities, assign any.
                         elif sent0 == sent1:
-                            # print(term, sent0, sent1)
                             lex = self.__assign_polarity(sent0[0], term, lex)
-                        elif sent0 == [0]:
-                            lex = self.__assign_polarity(sent1[0], term, lex)
-                        elif sent1 == [0]:
-                            lex = self.__assign_polarity(sent0[0], term, lex)
-                        # if opposing polarities, assign negative.
+                        # If opposing polarities, ignore the term.
                         else:
-                            # print(term, sent0, sent1)
-                            lex['NEGATIVO'] += [term]
+                            pass
 
         lex['POSITIVO'] = sorted(list(set(lex['POSITIVO'])))
         lex['NEGATIVO'] = sorted(list(set(lex['NEGATIVO'])))
