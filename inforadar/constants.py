@@ -21,11 +21,11 @@ base_dir = 'inforadar/lexica/'
 # fp_lex_liwc = '{}processed\\liwc.pkl'.format(base_dir)
 
 # Sentiment lexica
-# fp_lex_raw_sent_sentilex = '{}SentiLex-flex-PT02.txt'.format(base_dir)
+fp_lex_raw_sent_sentilex = '{}SentiLex-flex-PT02.txt'.format(base_dir)
 # fp_lex_raw_oplexicon = '{}oplexico_v3.0.txt'.format(base_dir)
 fp_lex_sent = '{}processed/sentiment.pkl'.format(base_dir)
 
 # Subjectivity lexicon
 # fp_lex_raw_subj = '{}subjectivity-clues-pt.csv'.format(base_dir)
-# fp_lex_subj = '{}processed\\subjectivity.pkl'.format(base_dir)
+fp_lex_subj = '{}processed/subjectivity.pkl'.format(base_dir)
 

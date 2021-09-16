@@ -9,6 +9,7 @@ import inforadar.config as config
 from inforadar import constants
 from inforadar.article import Article
 from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
+from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
 from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
 
@@ -130,11 +131,16 @@ class Metrics(Resource):
 
                 art = Article(headline, body_text, n_grams=1)
                 content = art.headline_as_list + art.body_as_list
+                content_stems = art.headline_stems + art.body_stems
 
                 if available_metrics[metric_id] == 'sentiment':
                     sentiment_metric = SentimentMetric()
                     sentiment_metric.load_lexicon(constants.fp_lex_sent)
                     score = sentiment_metric.compute_metric(text_as_list=content)
+                elif available_metrics[metric_id] == 'subjectivity':
+                    subjectivity_metric = SubjectivityMetric()
+                    subjectivity_metric.load_lexicon(constants.fp_lex_subj)
+                    score = subjectivity_metric.compute_metric(text_as_list=content_stems)
                 else:
                     # TODO:
                     # metric_instance = instantiate_metric(metric)
