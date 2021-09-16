@@ -9,6 +9,7 @@ import inforadar.config as config
 from inforadar import constants
 from inforadar.article import Article
 from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
+from inforadar.credibility_metrics.spell_checking_metric import SpellCheckingMetric
 from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
 from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
@@ -65,7 +66,7 @@ class Metrics(Resource):
         # Request validation.
         # --------------------------
         if not request.data:
-            return {'message': f"Missing a JSON body in the request."}, 422
+            return {"message": f"Missing a JSON body in the request."}, 422
 
         schema_1 = {
             "id": {"type": "integer", "required": True},
@@ -89,7 +90,7 @@ class Metrics(Resource):
         validator = Validator()
         valid = any(validator(request.get_json(force=True), schema) for schema in [schema_1, schema_2])
         if not valid:
-            return {'message': f"Unsupported json object: " + str(validator.errors)}, 400
+            return {"message": f"Unsupported json object: " + str(validator.errors)}, 400
 
         data = request.get_json(force=True)
         metrics = dict()
@@ -102,7 +103,7 @@ class Metrics(Resource):
             # metrics_records = Category.query.with_entities(Metric.id, Metric.name).all()
             article = CrowdsourcedArticle.query.filter_by(id=data["id"]).first()
             if not article:
-                return {'message': f"Invalid article id: " + str(data["id"]) + "."}, 400
+                return {"message": f"Invalid article id: " + str(data["id"]) + "."}, 400
             article_id = article.id
             headline = article.headline
             body_text = article.body_text
@@ -133,14 +134,18 @@ class Metrics(Resource):
                 content = art.headline_as_list + art.body_as_list
                 content_stems = art.headline_stems + art.body_stems
 
-                if available_metrics[metric_id] == 'sentiment':
+                if available_metrics[metric_id] == "sentiment":
                     sentiment_metric = SentimentMetric()
                     sentiment_metric.load_lexicon(constants.fp_lex_sent)
                     score = sentiment_metric.compute_metric(text_as_list=content)
-                elif available_metrics[metric_id] == 'subjectivity':
+                elif available_metrics[metric_id] == "subjectivity":
                     subjectivity_metric = SubjectivityMetric()
                     subjectivity_metric.load_lexicon(constants.fp_lex_subj)
                     score = subjectivity_metric.compute_metric(text_as_list=content_stems)
+                elif available_metrics[metric_id] == "spell_checking":
+                    spell_checking_metric = SpellCheckingMetric()
+                    score = spell_checking_metric.compute_metric(text_as_list=content)
+
                 else:
                     # TODO:
                     # metric_instance = instantiate_metric(metric)
