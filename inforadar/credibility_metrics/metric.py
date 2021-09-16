@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 class Metric(ABC):
     def __init__(self):
         self.lexicon = None
-        self.stemmer = nltk.stem.SnowballStemmer('portuguese')
+        self.stemmer = nltk.stem.SnowballStemmer("portuguese")
 
     @abstractmethod
     def create_lexicon(self, raw_file_path):
@@ -17,11 +17,11 @@ class Metric(ABC):
         pass
 
     def load_lexicon(self, filepath):
-        with open(filepath, 'rb') as f:
+        with open(filepath, "rb") as f:
             self.lexicon = pickle.load(f)
 
     def save_lexicon(self, filepath):
-        with open(filepath, 'wb') as f:
+        with open(filepath, "wb") as f:
             pickle.dump(self.lexicon, f)
 
     def term_to_stem(self, term):
