@@ -4,7 +4,7 @@ from inforadar.config import db, ma
 class ErcSource(db.Model):
     __tablename__ = "erc_sources"
     id = db.Column(db.Integer, primary_key=True)
-    register_number = db.Column(db.Integer)
+    registration_number = db.Column(db.Integer)
     registration_date = db.Column(db.DateTime)
     title = db.Column(db.String(255))
     periodicity = db.Column(db.String(50))
