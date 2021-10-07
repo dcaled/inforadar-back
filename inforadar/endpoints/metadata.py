@@ -13,7 +13,7 @@ class Metadata(Resource):
         category_data = category_schema.dump(category)
 
         # Order to be exhibit in the front-end.
-        front_end_order = ["factual", "conspiracy", "satire", "entertainment", "opinion"]
+        front_end_order = ["factual", "opinion", "entertainment", "satire", "conspiracy"]
         response = sorted(category_data, key=lambda k: front_end_order.index(k["name"]))
 
         return response
