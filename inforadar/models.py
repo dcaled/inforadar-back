@@ -1,6 +1,36 @@
 from inforadar.config import db, ma
 
 
+class ErcSource(db.Model):
+    __tablename__ = "erc_sources"
+    id = db.Column(db.Integer, primary_key=True)
+    register_number = db.Column(db.Integer)
+    registration_date = db.Column(db.DateTime)
+    title = db.Column(db.String(255))
+    periodicity = db.Column(db.String(50))
+    support = db.Column(db.String(50))
+    content_type = db.Column(db.String(255))
+    geographic_scope = db.Column(db.String(50))
+    director = db.Column(db.String(50))
+    owner = db.Column(db.String(255))
+    editor = db.Column(db.String(255))
+    district = db.Column(db.String(50))
+    municipality = db.Column(db.String(50))
+    office_address = db.Column(db.String(255))
+    location = db.Column(db.String(50))
+    postal_code = db.Column(db.String(50))
+    institutional_email = db.Column(db.String(50))
+    website = db.Column(db.String(255))
+    domain = db.Column(db.String(50))
+    last_update = db.Column(db.DateTime, nullable=False)
+
+
+class ErcSourceSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ErcSource
+        load_instance = True
+
+
 class Category(db.Model):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
