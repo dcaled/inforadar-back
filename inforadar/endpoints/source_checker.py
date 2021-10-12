@@ -2,7 +2,7 @@ from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
-from inforadar.models import ErcSource
+from inforadar.models import ErcSource, ErcSourceSchema
 
 import tldextract
 
@@ -12,7 +12,7 @@ class SourceChecker(Resource):
         """
         Receives an url, and checks if the source is validated by ERC.
         Input: news article's url.
-        Output: ERC registration number if the source is registered, and None otherwise.
+        Output: Source data, according ERC registers. If the provided registration number is not found, returns None.
         """
 
         # --------------------------
@@ -40,10 +40,17 @@ class SourceChecker(Resource):
 
         if erc_source_subdomain:
             # print(erc_source_subdomain.title, erc_source_subdomain.registration_number)
-            return erc_source_subdomain.registration_number, 200
+            # Serialize the data for the response
+            erc_source_schema = ErcSourceSchema(many=False)
+            erc_source_data = erc_source_schema.dump(erc_source_subdomain)
+            return erc_source_data, 200
+
         elif erc_source_domain:
             # print(erc_source_domain.title, erc_source_domain.registration_number)
-            return erc_source_domain.registration_number, 200
+            # Serialize the data for the response
+            erc_source_schema = ErcSourceSchema(many=False)
+            erc_source_data = erc_source_schema.dump(erc_source_subdomain)
+            return erc_source_data, 200
         # Subdomain and domain not found.
         else:
             return None, 200
