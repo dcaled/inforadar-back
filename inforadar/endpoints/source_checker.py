@@ -49,7 +49,7 @@ class SourceChecker(Resource):
             # print(erc_source_domain.title, erc_source_domain.registration_number)
             # Serialize the data for the response
             erc_source_schema = ErcSourceSchema(many=False)
-            erc_source_data = erc_source_schema.dump(erc_source_subdomain)
+            erc_source_data = erc_source_schema.dump(erc_source_domain)
             return erc_source_data, 200
         # Subdomain and domain not found.
         else:
