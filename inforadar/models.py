@@ -183,7 +183,6 @@ class CorpusArticleSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
 
 
-# TODO: rever.
 class CorpusMetricScore(db.Model):
     __tablename__ = "corpus_metrics_scores"
     id = db.Column(db.Integer, primary_key=True)
@@ -195,7 +194,6 @@ class CorpusMetricScore(db.Model):
     )
 
 
-# TODO: rever.
 class CorpusMetricScoreSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = CorpusMetricScore
