@@ -44,9 +44,9 @@ class Metrics(Resource):
                     "categories": dict()
                 }
             metrics[record.metric_id]["categories"][record.category_id] = {
-                "first_quartile": 0,  # record.first_quartile,
-                "second_quartile": 25,  # record.second_quartile,
-                "third_quartile": 50,  # record.third_quartile,
+                "first_quartile": 25,  # record.first_quartile,
+                "second_quartile": 50,  # record.second_quartile,
+                "third_quartile": 75,  # record.third_quartile,
                 "fourth_quartile": 100  # record.fourth_quartile
             }
 
