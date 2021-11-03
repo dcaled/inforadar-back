@@ -23,13 +23,15 @@ class Metrics(Resource):
         """
 
         records = CorpusMetricQuartile.query \
-            .join(Metric, Metric.id == CorpusMetricQuartile.metric_id) \
             .join(Category, Category.id == CorpusMetricQuartile.category_id) \
             .add_columns(Metric.id.label("metric_id"), Metric.name.label("metric_name"),
                          Metric.display_name.label("metric_display_name"), Metric.description,
                          Category.id.label("category_id"),
-                         CorpusMetricQuartile.first_quartile, CorpusMetricQuartile.second_quartile,
-                         CorpusMetricQuartile.third_quartile).all()
+                         # CorpusMetricQuartile.first_quartile,
+                         # CorpusMetricQuartile.second_quartile,
+                         # CorpusMetricQuartile.third_quartile
+                         ).all()
+            # .join(Metric, Metric.id == CorpusMetricQuartile.metric_id) \
 
         metrics = dict()
         for record in records:
@@ -42,9 +44,10 @@ class Metrics(Resource):
                     "categories": dict()
                 }
             metrics[record.metric_id]["categories"][record.category_id] = {
-                "first_quartile": record.first_quartile,
-                "second_quartile": record.second_quartile,
-                "third_quartile": record.third_quartile
+                "first_quartile": 0,  # record.first_quartile,
+                "second_quartile": 25,  # record.second_quartile,
+                "third_quartile": 50,  # record.third_quartile,
+                "fourth_quartile": 100  # record.fourth_quartile
             }
 
         metrics = list(metrics.values())
