@@ -164,14 +164,19 @@ class CrowdsourcedIndicatorScoreSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
 
 
-# TODO: rever.
 class CorpusArticle(db.Model):
     __tablename__ = "corpus_articles"
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    source = db.Column(db.String(50), nullable=False)
+    url = db.Column(db.String(255), unique=True, nullable=True)
+    headline = db.Column(db.String(255), nullable=False)
+    body_text = db.Column(db.Text, nullable=False)
+    top_image = db.Column(db.String(255), nullable=True)
+    publish_date = db.Column(db.DateTime, nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
 
 
-# TODO: rever.
 class CorpusArticleSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = CorpusArticle
