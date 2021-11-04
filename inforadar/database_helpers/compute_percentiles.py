@@ -16,9 +16,10 @@ def main():
     conn = engine.connect()
 
     metrics = {
-        1: "sentiment",
-        2: "subjectivity",
-        3: "spell_checking"
+        # 1: "sentiment",
+        # 2: "subjectivity",
+        # 3: "spell_checking",
+        5: "headline_accuracy"
     }
 
     category_ids = Category.query.with_entities(Category.id)
