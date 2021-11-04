@@ -4,6 +4,7 @@ import sys
 from cerberus import Validator
 from flask import request
 from flask_restful import Resource
+from gensim.models import KeyedVectors
 
 import inforadar.config as config
 from inforadar import constants
@@ -15,8 +16,13 @@ from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
 from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
 
+global_word_embeddings_model = KeyedVectors.load_word2vec_format(constants.fp_emb_matrix,
+                                                                 binary=False,
+                                                                 limit=None)
+
 
 class Metrics(Resource):
+
     def get(self):
         """
         Output: dictionary listing each metric, the corresponding description, and the quartiles for each category
@@ -164,7 +170,7 @@ class Metrics(Resource):
                         message = "Error when computing headline_accuracy. No body text provided."
                         new_metrics[metric_id] = {"score": score, "message": message}
                     else:
-                        headline_accuracy_metric = HeadlineAccuracyMetric(constants.fp_emb_matrix)
+                        headline_accuracy_metric = HeadlineAccuracyMetric(global_word_embeddings_model)
                         score = headline_accuracy_metric.compute_metric(headline=art.headline_as_list,
                                                                         body_text=art.body_as_list[:100])
                         new_metrics[metric_id] = {"score": score}
