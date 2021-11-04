@@ -8,6 +8,7 @@ from flask_restful import Resource
 import inforadar.config as config
 from inforadar import constants
 from inforadar.article import Article
+from inforadar.credibility_metrics.headline_accuracy_metric import HeadlineAccuracyMetric
 from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
 from inforadar.credibility_metrics.spell_checking_metric import SpellCheckingMetric
 from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
@@ -31,7 +32,7 @@ class Metrics(Resource):
                          # CorpusMetricQuartile.second_quartile,
                          # CorpusMetricQuartile.third_quartile
                          ).all()
-            # .join(Metric, Metric.id == CorpusMetricQuartile.metric_id) \
+        # .join(Metric, Metric.id == CorpusMetricQuartile.metric_id) \
 
         metrics = dict()
         for record in records:
@@ -107,7 +108,6 @@ class Metrics(Resource):
             article = CrowdsourcedArticle.query.filter_by(id=data["id"]).first()
             if not article:
                 return {"message": f"Invalid article id: " + str(data["id"]) + "."}, 400
-            article_id = article.id
             headline = article.headline
             body_text = article.body_text
 
@@ -141,20 +141,42 @@ class Metrics(Resource):
                     sentiment_metric = SentimentMetric()
                     sentiment_metric.load_lexicon(constants.fp_lex_sent)
                     score = sentiment_metric.compute_metric(text_as_list=content)
+                    new_metrics[metric_id] = {"score": score}
+
                 elif available_metrics[metric_id] == "subjectivity":
                     subjectivity_metric = SubjectivityMetric()
                     subjectivity_metric.load_lexicon(constants.fp_lex_subj)
                     score = subjectivity_metric.compute_metric(text_as_list=content_stems)
+                    new_metrics[metric_id] = {"score": score}
+
                 elif available_metrics[metric_id] == "spell_checking":
                     spell_checking_metric = SpellCheckingMetric()
                     score = spell_checking_metric.compute_metric(text_as_list=content)
+                    new_metrics[metric_id] = {"score": score}
+
+                elif available_metrics[metric_id] == "headline_accuracy":
+                    if not headline:
+                        score = None
+                        message = "Error when computing headline_accuracy. No headline provided."
+                        new_metrics[metric_id] = {"score": score, "message": message}
+                    elif not body_text:
+                        score = None
+                        message = "Error when computing headline_accuracy. No body text provided."
+                        new_metrics[metric_id] = {"score": score, "message": message}
+                    else:
+                        headline_accuracy_metric = HeadlineAccuracyMetric(constants.fp_emb_matrix)
+                        score = headline_accuracy_metric.compute_metric(headline=art.headline_as_list,
+                                                                        body_text=art.body_as_list[:100])
+                        new_metrics[metric_id] = {"score": score}
 
                 else:
                     # TODO:
                     # metric_instance = instantiate_metric(metric)
                     # score = metric_instance.compute_score(article)
                     score = random.uniform(0, 1)
-                new_metrics[metric_id] = {"score": score}
+                    new_metrics[metric_id] = {"score": score}
+
+                print(new_metrics)
 
         metrics.update(new_metrics)
 
@@ -162,33 +184,33 @@ class Metrics(Resource):
         # Persist new metrics.
         # --------------------------
         if article_id:
-            for metric_id in new_metrics.keys():
-                metric_score = CrowdsourcedMetricScore(metric_id=metric_id,
-                                                       crowdsourced_article_id=article_id,
-                                                       score=new_metrics[metric_id]["score"])
-                config.db.session.add(metric_score)
-            config.db.session.commit()
+            for metric_id, values in new_metrics.items():
+                if values["score"] is not None:
+                    metric_score = CrowdsourcedMetricScore(metric_id=metric_id,
+                                                           crowdsourced_article_id=article_id,
+                                                           score=new_metrics[metric_id]["score"])
+                    config.db.session.add(metric_score)
+                    config.db.session.commit()
 
         # --------------------------
         # Get percentiles.
         # --------------------------
-        a = []
-        for metric_id in metrics.keys():
+        for metric_id, values in metrics.items():
             metrics[metric_id]["percentiles"] = {"categories": dict()}
-            for category_id in categories.keys():
+            if values["score"] is not None:
+                for category_id in categories.keys():
+                    metrics_records = MetricPercentile.query \
+                        .join(CorpusMetricScore, CorpusMetricScore.id == MetricPercentile.corpus_metric_score_id) \
+                        .add_columns(MetricPercentile.percentile) \
+                        .filter(MetricPercentile.metric_id == metric_id) \
+                        .filter(MetricPercentile.category_id == category_id) \
+                        .filter(CorpusMetricScore.score <= metrics[metric_id]["score"]) \
+                        .order_by(CorpusMetricScore.score.desc()) \
+                        .first()
 
-                metrics_records = MetricPercentile.query \
-                    .join(CorpusMetricScore, CorpusMetricScore.id == MetricPercentile.corpus_metric_score_id) \
-                    .add_columns(MetricPercentile.percentile) \
-                    .filter(MetricPercentile.metric_id == metric_id) \
-                    .filter(MetricPercentile.category_id == category_id) \
-                    .filter(CorpusMetricScore.score <= metrics[metric_id]["score"]) \
-                    .order_by(CorpusMetricScore.score.desc()) \
-                    .first()
-
-                if metrics_records:
-                    metrics[metric_id]["percentiles"]["categories"][category_id] = metrics_records.percentile
-                else:
-                    metrics[metric_id]["percentiles"]["categories"][category_id] = 0.0
+                    if metrics_records:
+                        metrics[metric_id]["percentiles"]["categories"][category_id] = metrics_records.percentile
+                    else:
+                        metrics[metric_id]["percentiles"]["categories"][category_id] = 0.0
 
         return metrics, 200
