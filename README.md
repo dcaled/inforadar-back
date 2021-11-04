@@ -1,11 +1,16 @@
 # InfoRadar
 InfoRadar - REST API.
 
-## Dependencies
-Python version used: 3.9
+## Installation
 
+### External files
+* Download and extract [CBOW 300 dimensions](http://143.107.183.175:22980/download.php?file=embeddings/word2vec/cbow_s300.zip) into `inforadar/lexica` folder. 
 
-### For downloading packages, run commands:
+### Dependencies
+* Python version: 3.9
+* Anaconda version: 4.8.5
+
+#### For downloading packages, run commands:
 * conda install psycopg2
 * conda install -c conda-forge cerberus
 * conda install flask-restful
@@ -16,14 +21,14 @@ Python version used: 3.9
 * conda install -c conda-forge newspaper3k
 * conda install pytorch torchvision torchaudio cpuonly -c pytorch
 * conda install -c conda-forge transformers
-*  conda install -c conda-forge pyspellchecker 
+* conda install -c conda-forge pyspellchecker 
 
-## To run:
+### Start the server
     pip install -e .
     (Windows) set FLASK_APP=inforadar
     (Linux) export FLASK_APP=inforadar
     flask run
 
-## To upgrade on the server:
+### Update InfoRadar
     git pull
     sudo systemctl restart inforadarapi.service 
