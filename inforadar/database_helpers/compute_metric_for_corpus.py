@@ -1,3 +1,7 @@
+import numpy as np
+from gensim.models import KeyedVectors
+from scipy import spatial
+
 import inforadar.config as config
 from inforadar.article import Article
 from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
@@ -26,6 +30,32 @@ def compute_spell_checking_article(content):
     return score
 
 
+def text2vec(word_embeddings_model, text_as_list):
+    text_embeddings = []
+    for word in text_as_list:
+        try:
+            word_embeddings = word_embeddings_model[word]
+            text_embeddings += [word_embeddings]
+        except KeyError:
+            continue
+
+    # If there's no embedding vector for the words in text, returns None.
+    if not text_embeddings:
+        return None
+    text_embeddings = np.vstack(text_embeddings)
+    mean_embeddings_vector = np.mean(text_embeddings, axis=0)
+    return mean_embeddings_vector
+
+
+def compute_headline_accuracy_article(word_embeddings_model, headline_as_list, body_as_list):
+    score = 0
+    headline_embeddings = text2vec(word_embeddings_model, headline_as_list)
+    body_text_embeddings = text2vec(word_embeddings_model, body_as_list)
+    if headline_embeddings is not None and body_text_embeddings is not None:
+        score = 1 - spatial.distance.cosine(headline_embeddings, body_text_embeddings)
+    return score
+
+
 def insert_article_metrics_scores(id_article, metric_id, score):
     corpus_metric_score = CorpusMetricScore(
         corpus_article_id=id_article,
@@ -38,12 +68,17 @@ def insert_article_metrics_scores(id_article, metric_id, score):
 
 def main():
     path_to_sentiment_lexicon = "path_to_sentiment_lexicon.pkl"
-    path_to_subjectivity_lexicon = "path_to_subjectivity_lexicon.pkl "
+    path_to_subjectivity_lexicon = "path_to_subjectivity_lexicon.pkl"
+    path_to_embedding_weights = "path_to_cbow_s300.txt"
 
+    word_embeddings_model = KeyedVectors.load_word2vec_format(path_to_embedding_weights,
+                                                              binary=False,
+                                                              limit=None)
     metrics = {
         1: "sentiment",
         2: "subjectivity",
-        3: "spell_checking"
+        3: "spell_checking",
+        5: "headline_accuracy"
     }
 
     corpus = CorpusArticle.query.with_entities(CorpusArticle.id, CorpusArticle.headline, CorpusArticle.body_text)
@@ -55,14 +90,24 @@ def main():
         content = article.headline_as_list + article.body_as_list
         content_stems = article.headline_stems + article.body_stems
 
-        sentiment_score = compute_sentiment_article(path_to_sentiment_lexicon, content)
-        insert_article_metrics_scores(corpus_article.id, 1, sentiment_score)
+        # Sentiment
+        # sentiment_score = compute_sentiment_article(path_to_sentiment_lexicon, content)
+        # insert_article_metrics_scores(corpus_article.id, 1, sentiment_score)
 
-        subjectivity_score = compute_subjectivity_article(path_to_subjectivity_lexicon, content_stems)
-        insert_article_metrics_scores(corpus_article.id, 2, subjectivity_score)
+        # Subjectivity
+        # subjectivity_score = compute_subjectivity_article(path_to_subjectivity_lexicon, content_stems)
+        # insert_article_metrics_scores(corpus_article.id, 2, subjectivity_score)
 
-        spell_checking_score = compute_spell_checking_article(content)
-        insert_article_metrics_scores(corpus_article.id, 3, spell_checking_score)
+        # Spell checking
+        # spell_checking_score = compute_spell_checking_article(content)
+        # insert_article_metrics_scores(corpus_article.id, 3, spell_checking_score)
+
+        # Headline accuracy
+        headline_accuracy_score = compute_headline_accuracy_article(word_embeddings_model,
+                                                                    article.headline_as_list,
+                                                                    article.body_as_list[:100])
+        insert_article_metrics_scores(corpus_article.id, 5, headline_accuracy_score)
+        # print(headline_accuracy_score)
 
 
 if __name__ == '__main__':
