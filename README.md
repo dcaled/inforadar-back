@@ -10,21 +10,23 @@ InfoRadar - REST API.
 * Python version: 3.9
 * Anaconda version: 4.8.5
 
-#### For downloading packages, run commands:
-* conda install psycopg2
-* conda install -c conda-forge cerberus
-* conda install flask-restful
-* conda install flask-sqlalchemy
-* conda install -c conda-forge flask-marshmallow
-* conda install marshmallow-sqlalchemy
-* conda install -c conda-forge flup
-* conda install -c conda-forge newspaper3k
-* conda install pytorch torchvision torchaudio cpuonly -c pytorch
-* conda install -c conda-forge transformers
-* conda install -c conda-forge pyspellchecker 
+Install the application dependencies:
+
+    pip install -e .
 
 ### Start the server
-    pip install -e .
+
+
+
+Before starting the application, initiate the `multiprocessing.Manager` as a separate process.
+
+    run python inforadar/word_embeddings_manager.py
+
+From the Python documentation:
+>Managers provide a way to create data which can be shared between different processes, including sharing over a network between processes running on different machines. A manager object controls a server process which manages shared objects. Other processes can access the shared objects by using proxies.
+
+Then, start the server running flask:
+
     (Windows) set FLASK_APP=inforadar
     (Linux) export FLASK_APP=inforadar
     flask run
