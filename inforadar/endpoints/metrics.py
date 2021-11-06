@@ -1,5 +1,5 @@
 import random
-import sys
+from multiprocessing.managers import BaseManager
 
 from cerberus import Validator
 from flask import request, g
@@ -165,7 +165,11 @@ class Metrics(Resource):
                         message = "Error when computing headline_accuracy. No body text provided."
                         new_metrics[metric_id] = {"score": score, "message": message}
                     else:
-                        headline_accuracy_metric = HeadlineAccuracyMetric(config.word_embeddings_model)
+                        BaseManager.register("create_embedding_matrix")  # , proxytype=IteratorProxy)
+                        manager = BaseManager(address=('localhost', 5001), authkey=b'pass')
+                        manager.connect()
+                        word_embeddings_model = manager.create_embedding_matrix(constants.fp_emb_matrix, embedding_dim=300)._getvalue()
+                        headline_accuracy_metric = HeadlineAccuracyMetric(word_embeddings_model)
                         score = headline_accuracy_metric.compute_metric(headline=art.headline_as_list,
                                                                         body_text=art.body_as_list[:100])
                         new_metrics[metric_id] = {"score": score}
