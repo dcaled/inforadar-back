@@ -8,6 +8,31 @@ import tldextract
 
 
 class SourceChecker(Resource):
+    def get(self):
+
+        #TODO: This is a temporary solution. The field names should be in a custom config file in the front-end.
+
+        fields = {
+            "district": "Distrito",
+            "registration_number": "Número de registo",
+            "registration_date": "Data de inscrição",
+            "title": "Título",
+            "periodicity": "Periodicidade",
+            "director": "Diretor",
+            "owner": "Proprietário",
+            "office_address": "Sede de redação",
+            "location": "Localidade",
+            "postal_code": "Código Postal",
+            "municipality": "Concelho",
+            "support": "Suporte",
+            "institutional_email": "E-mail",
+            "website": "Site",
+            "content_type": "Conteúdo",
+            "geographic_scope": "Âmbito geográfico",
+            "editor": "Editor"
+        }
+        return fields
+
     def post(self):
         """
         Receives an url, and checks if the source is validated by ERC.
