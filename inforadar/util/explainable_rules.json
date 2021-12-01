@@ -11,8 +11,8 @@
 					"max": 25
 				},
 				"3": {
-					"min": 75,
-					"max": 100
+					"min": null,
+					"max": null
 				},
 				"4": {
 					"min": 0,
@@ -35,8 +35,8 @@
 					"max": 100
 				},
 				"3": {
-					"min": 75,
-					"max": 100
+					"min": null,
+					"max": null
 				},
 				"4": {
 					"min": null,
@@ -83,8 +83,8 @@
 					"max": 100
 				},
 				"3": {
-					"min": 50,
-					"max": 100
+					"min": null,
+					"max": null
 				},
 				"4": {
 					"min": 0,
@@ -107,8 +107,8 @@
 					"max": 100
 				},
 				"3": {
-					"min": 50,
-					"max": 100
+					"min": null,
+					"max": null
 				},
 				"4": {
 					"min": 0,
