@@ -8,7 +8,7 @@ from newspaper import Config
 
 import inforadar.config as config
 from inforadar.models import CrowdsourcedArticle
-
+from inforadar.util.check_erc_entries import is_registered_domain
 
 class Scraper(Resource):
     def post(self):
@@ -55,12 +55,14 @@ class Scraper(Resource):
                     if article.publish_date:
                         publish_date = article.publish_date.strftime('%Y-%m-%d %H:%M:%S')
 
+                    erc_flag = True if is_registered_domain(data["url"]) else False
                     crowdsourced_article = CrowdsourcedArticle(
                         headline=article.title,
                         body_text=article.text,
                         url=data["url"],
                         top_image=article.top_image,
-                        publish_date=publish_date
+                        publish_date=publish_date,
+                        erc_registered=erc_flag
                     )
 
                     # TODO:

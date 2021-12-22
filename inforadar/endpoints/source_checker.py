@@ -2,9 +2,7 @@ from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
-from inforadar.models import ErcSource, ErcSourceSchema
-
-import tldextract
+from inforadar.util.check_erc_entries import is_registered_domain
 
 
 class SourceChecker(Resource):
@@ -54,30 +52,6 @@ class SourceChecker(Resource):
             return {'message': f"Unsupported json object: " + str(validator.errors)}, 400
 
         data = request.get_json(force=True)
-
-        # Check if URL subdomain (or domain) belongs to a verified source.
-        ext = tldextract.extract(data["url"])
-        domain = "{}.{}".format(ext.domain, ext.suffix)
-        subdomain = "{}.{}.{}".format(ext.subdomain, ext.domain, ext.suffix).replace("www.", "")
-
-        erc_source_subdomain = ErcSource.query.filter_by(domain=subdomain).first()
-        erc_source_domain = ErcSource.query.filter_by(domain=domain).first()
-
-        if erc_source_subdomain:
-            # print(erc_source_subdomain.title, erc_source_subdomain.registration_number)
-            # Serialize the data for the response
-            erc_source_schema = ErcSourceSchema(many=False)
-            erc_source_data = erc_source_schema.dump(erc_source_subdomain)
-            return erc_source_data, 200
-
-        elif erc_source_domain:
-            # print(erc_source_domain.title, erc_source_domain.registration_number)
-            # Serialize the data for the response
-            erc_source_schema = ErcSourceSchema(many=False)
-            erc_source_data = erc_source_schema.dump(erc_source_domain)
-            return erc_source_data, 200
-        # Subdomain and domain not found.
-        else:
-            return None, 200
+        return is_registered_domain(data["url"]), 200
 
 
