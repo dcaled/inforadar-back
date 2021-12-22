@@ -7,6 +7,7 @@ from inforadar.endpoints.metrics import Metrics
 from inforadar.endpoints.scrapper import Scraper
 from inforadar.endpoints.source_checker import SourceChecker
 from inforadar.endpoints.explainable_rules import ExplainableRules
+from inforadar.endpoints.examples import Examples
 
 api = Api(app)
 
@@ -16,6 +17,7 @@ api.add_resource(Scraper, '/api2/scrapper')
 api.add_resource(Metadata, '/api2/metadata')
 api.add_resource(SourceChecker, '/api2/source_checker')
 api.add_resource(ExplainableRules, '/api2/explainable_rules')
+api.add_resource(Examples, '/api2/examples')
 
 
 if __name__ == '__main__':
