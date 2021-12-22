@@ -121,6 +121,7 @@ class CrowdsourcedArticle(db.Model):
     source = db.Column(db.String(50), nullable=True)
     publish_date = db.Column(db.DateTime, nullable=True)
     creation_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=True)
+    erc_registered = db.Column(db.Boolean, nullable=True)
 
 
 class CrowdsourcedArticleSchema(ma.SQLAlchemyAutoSchema):
