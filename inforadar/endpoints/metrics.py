@@ -14,6 +14,8 @@ from inforadar.credibility_metrics.spell_checking_metric import SpellCheckingMet
 from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
 from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
+from ..constants import current_version_metric_sentiment, current_version_metric_subjectivity, \
+    current_version_metric_spell_checking,current_version_metric_headline_accuracy
 
 
 class Metrics(Resource):
@@ -112,6 +114,8 @@ class Metrics(Resource):
             headline = article.headline
             body_text = article.body_text
 
+            # TODO: Attention: when a new version of the indicators calculator is released, you should update this
+            #  query to retrieve the score of the current indicator calculator.
             metrics_records = CrowdsourcedArticle.query \
                 .join(CrowdsourcedMetricScore,
                       CrowdsourcedMetricScore.crowdsourced_article_id == CrowdsourcedArticle.id) \
@@ -142,18 +146,27 @@ class Metrics(Resource):
                     sentiment_metric = SentimentMetric()
                     sentiment_metric.load_lexicon(constants.fp_lex_sent)
                     score = sentiment_metric.compute_metric(text_as_list=content)
-                    new_metrics[metric_id] = {"score": score}
+                    new_metrics[metric_id] = {
+                        "score": score,
+                        "version": current_version_metric_sentiment
+                    }
 
                 elif available_metrics[metric_id] == "subjectivity":
                     subjectivity_metric = SubjectivityMetric()
                     subjectivity_metric.load_lexicon(constants.fp_lex_subj)
                     score = subjectivity_metric.compute_metric(text_as_list=content_stems)
-                    new_metrics[metric_id] = {"score": score}
+                    new_metrics[metric_id] = {
+                        "score": score,
+                        "version": current_version_metric_subjectivity
+                    }
 
                 elif available_metrics[metric_id] == "spell_checking":
                     spell_checking_metric = SpellCheckingMetric()
                     score = spell_checking_metric.compute_metric(text_as_list=content)
-                    new_metrics[metric_id] = {"score": score}
+                    new_metrics[metric_id] = {
+                        "score": score,
+                        "version": current_version_metric_spell_checking
+                    }
 
                 elif available_metrics[metric_id] == "headline_accuracy":
                     if not headline:
@@ -165,21 +178,29 @@ class Metrics(Resource):
                         message = "Error when computing headline_accuracy. No body text provided."
                         new_metrics[metric_id] = {"score": score, "message": message}
                     else:
-                        BaseManager.register("create_embedding_matrix")  # , proxytype=IteratorProxy)
+                        BaseManager.register("create_embedding_matrix")
                         manager = BaseManager(address=('localhost', 5001), authkey=b'pass')
                         manager.connect()
-                        word_embeddings_model = manager.create_embedding_matrix(constants.fp_emb_matrix, embedding_dim=300)._getvalue()
+                        word_embeddings_model = manager.create_embedding_matrix(
+                            constants.fp_emb_matrix,
+                            embedding_dim=300)._getvalue()
                         headline_accuracy_metric = HeadlineAccuracyMetric(word_embeddings_model)
                         score = headline_accuracy_metric.compute_metric(headline=art.headline_as_list,
                                                                         body_text=art.body_as_list[:100])
-                        new_metrics[metric_id] = {"score": score}
+                        new_metrics[metric_id] = {
+                            "score": score,
+                            "version": current_version_metric_headline_accuracy
+                        }
 
                 else:
                     # TODO:
                     # metric_instance = instantiate_metric(metric)
                     # score = metric_instance.compute_score(article)
                     score = random.uniform(0, 1)
-                    new_metrics[metric_id] = {"score": score}
+                    new_metrics[metric_id] = {
+                        "score": score,
+                        "version": 1
+                    }
 
                 print(new_metrics)
 
@@ -193,7 +214,9 @@ class Metrics(Resource):
                 if values["score"] is not None:
                     metric_score = CrowdsourcedMetricScore(metric_id=metric_id,
                                                            crowdsourced_article_id=article_id,
-                                                           score=new_metrics[metric_id]["score"])
+                                                           score=new_metrics[metric_id]["score"],
+                                                           version=new_metrics[metric_id]["version"]
+                                                           )
                     config.db.session.add(metric_score)
                     config.db.session.commit()
 

@@ -136,6 +136,8 @@ class CrowdsourcedMetricScore(db.Model):
     metric_id = db.Column(db.Integer, db.ForeignKey('metrics.id'), nullable=False)
     crowdsourced_article_id = db.Column(db.Integer, db.ForeignKey('crowdsourced_articles.id'), nullable=False)
     score = db.Column(db.Float, nullable=False)
+    version = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
         db.UniqueConstraint('metric_id', 'crowdsourced_article_id'),
     )
@@ -154,6 +156,8 @@ class CrowdsourcedIndicatorScore(db.Model):
     crowdsourced_article_id = db.Column(db.Integer, db.ForeignKey('crowdsourced_articles.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     score = db.Column(db.Float, nullable=False)
+    version = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
         db.UniqueConstraint('indicator_id', 'crowdsourced_article_id', 'category_id'),
     )
@@ -190,6 +194,8 @@ class CorpusMetricScore(db.Model):
     corpus_article_id = db.Column(db.Integer, db.ForeignKey('corpus_articles.id'), nullable=False)
     metric_id = db.Column(db.Integer, db.ForeignKey('metrics.id'), nullable=False)
     score = db.Column(db.Float, nullable=False)
+    version = db.Column(db.Integer, nullable=False)
+    created_atv = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
         db.UniqueConstraint('corpus_article_id', 'metric_id'),
     )
@@ -208,6 +214,8 @@ class CorpusIndicatorScore(db.Model):
     corpus_article_id = db.Column(db.Integer, db.ForeignKey('corpus_articles.id'), nullable=False)
     indicator_id = db.Column(db.Integer, db.ForeignKey('indicators.id'), nullable=False)
     score = db.Column(db.Float, nullable=False)
+    version = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
         db.UniqueConstraint('corpus_article_id', 'indicator_id'),
     )
