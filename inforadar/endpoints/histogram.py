@@ -14,6 +14,10 @@ class Histogram(Resource):
         available_metrics = {
             record.id: record.name for record in metrics_records}
 
+        categories_records = Category.query.with_entities(
+            Category.id, Category.name).all()
+        categories = {record.id: record.name for record in categories_records}
+
         # --------------------------
         # Request validation.
         # --------------------------
@@ -39,29 +43,32 @@ class Histogram(Resource):
         data = request.get_json(force=True)
         metric_bins = dict()
         for metric_id in data.get("metrics"):
+            metric_bins[metric_id] = {"categories": dict()}
+            for category_id in categories.keys():
 
-            # Create the list of bins from our data
-            bins = config.db.session \
-                .query(
-                    (func.floor(CorpusMetricScore.score / 0.01) * 0.01).label("floor"),
-                    func.count(CorpusMetricScore.id).label("count")) \
-                .group_by("floor") \
-                .filter_by(metric_id=metric_id) \
-                .order_by("floor").all()
+                # Create the list of bins from our data
+                bins = config.db.session \
+                    .query(
+                        (func.floor(CorpusMetricScore.score / 0.01)
+                         * 0.01).label("floor"),
+                        func.count(CorpusMetricScore.id).label("count")) \
+                    .group_by("floor") \
+                    .filter_by(metric_id=metric_id) \
+                    .order_by("floor").all()
 
-            # select
-            #   floor(actions_count/100.00)*100 as bin_floor,
-            #   count(user_id) as count
-            # from product_actions
-            # group by bin_floor
-            # order by bin_floor;
+                # select
+                #   floor(actions_count/100.00)*100 as bin_floor,
+                #   count(user_id) as count
+                # from product_actions
+                # group by bin_floor
+                # order by bin_floor;
 
-            metric_bin = []
-            for b in bins:
-                metric_bin.append({
-                    "count": b.count,
-                    "value": b.floor
-                })
-            metric_bins[metric_id] = metric_bin
+                metric_bin = []
+                for b in bins:
+                    metric_bin.append({
+                        "count": b.count,
+                        "value": b.floor
+                    })
+                metric_bins[metric_id]["categories"][category_id] = metric_bin
 
         return metric_bins, 200
