@@ -1,21 +1,20 @@
+import sys
+
 from cerberus import Validator
 from flask import request
 from flask_restful import Resource
 
 from sqlalchemy.sql.expression import func
 import inforadar.config as config
-from inforadar.models import Category, Metric, CorpusMetricScore
+from inforadar.models import Category, Metric, CorpusMetricScore, CorpusArticle
 
 
 class Histogram(Resource):
     def post(self):
-        metrics_records = Category.query.with_entities(
-            Metric.id, Metric.name).all()
-        available_metrics = {
-            record.id: record.name for record in metrics_records}
+        metrics_records = Metric.query.with_entities(Metric.id, Metric.name).all()
+        available_metrics = {record.id: record.name for record in metrics_records}
 
-        categories_records = Category.query.with_entities(
-            Category.id, Category.name).all()
+        categories_records = Category.query.with_entities(Category.id, Category.name).all()
         categories = {record.id: record.name for record in categories_records}
 
         # --------------------------
@@ -45,15 +44,14 @@ class Histogram(Resource):
         for metric_id in data.get("metrics"):
             metric_bins[metric_id] = {"categories": dict()}
             for category_id in categories.keys():
-
                 # Create the list of bins from our data
                 bins = config.db.session \
-                    .query(
-                        (func.floor(CorpusMetricScore.score / 0.01)
-                         * 0.01).label("floor"),
-                        func.count(CorpusMetricScore.id).label("count")) \
+                    .query((func.floor(CorpusMetricScore.score / 0.01) * 0.01).label("floor"),
+                           func.count(CorpusMetricScore.id).label("count")) \
+                    .join(CorpusArticle, CorpusArticle.id == CorpusMetricScore.corpus_article_id) \
+                    .filter(CorpusMetricScore.metric_id == metric_id) \
+                    .filter(CorpusArticle.category_id == category_id) \
                     .group_by("floor") \
-                    .filter_by(metric_id=metric_id) \
                     .order_by("floor").all()
 
                 # select
