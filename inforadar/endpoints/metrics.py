@@ -66,7 +66,7 @@ class Metrics(Resource):
         categories_records = Category.query.with_entities(Category.id, Category.name).all()
         categories = {record.id: record.name for record in categories_records}
 
-        metrics_records = Category.query.with_entities(Metric.id, Metric.name).all()
+        metrics_records = Metric.query.with_entities(Metric.id, Metric.name).all()
         available_metrics = {record.id: record.name for record in metrics_records}
 
         # --------------------------
