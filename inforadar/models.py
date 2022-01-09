@@ -195,7 +195,7 @@ class CorpusMetricScore(db.Model):
     metric_id = db.Column(db.Integer, db.ForeignKey('metrics.id'), nullable=False)
     score = db.Column(db.Float, nullable=False)
     version = db.Column(db.Integer, nullable=False)
-    created_atv = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
         db.UniqueConstraint('corpus_article_id', 'metric_id'),
     )
