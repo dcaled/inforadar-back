@@ -34,7 +34,7 @@ class Indicators(Resource):
         categories_records = Category.query.with_entities(Category.id, Category.name).all()
         categories = {record.id: record.name for record in categories_records}
 
-        indicators_records = Category.query.with_entities(Indicator.id, Indicator.name).all()
+        indicators_records = Indicator.query.with_entities(Indicator.id, Indicator.name).all()
         available_indicators = {record.id: record.name for record in indicators_records}
 
         # --------------------------
