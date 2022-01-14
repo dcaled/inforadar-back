@@ -46,7 +46,7 @@ class Histogram(Resource):
             for category_id in categories.keys():
                 # Create the list of bins from our data
                 bins = config.db.session \
-                    .query((func.floor(CorpusMetricScore.score / 0.01) * 0.01).label("floor"),
+                    .query((func.floor(CorpusMetricScore.score / 0.001) * 0.001).label("floor"),
                            func.count(CorpusMetricScore.id).label("count")) \
                     .join(CorpusArticle, CorpusArticle.id == CorpusMetricScore.corpus_article_id) \
                     .filter(CorpusMetricScore.metric_id == metric_id) \
