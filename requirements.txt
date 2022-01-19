@@ -109,6 +109,7 @@ requests-file=1.5.1
 s3transfer=0.5.0
 sacremoses=0.0.43
 scipy=1.7.1
+seaborn=0.11.2
 setuptools=52.0.0
 sgmllib3k=1.0.0
 six=1.16.0

@@ -10,6 +10,7 @@ import numpy as np
 import seaborn as sns
 from scipy import stats
 import matplotlib.pyplot as plt
+from matplotlib import colors
 from sqlalchemy.sql.expression import func
 import inforadar.config as config
 from inforadar.models import Category, Metric, CorpusMetricScore, CorpusArticle
@@ -81,11 +82,24 @@ class Histogram(Resource):
                     .order_by(CorpusMetricScore.score)
 
                 df = pd.read_sql(bins.statement, bins.session.bind)
-                df['floor'] = np.where(
-                    df['category_id'] == category_id, f'categoria {category_id}', 'others')
-                plt.rcParams["figure.figsize"] = [4, 3]
-                sns.histplot(data=df, x="score",
-                             hue="floor", bins=25, hue_order=[f'categoria {category_id}', "others"]).plot()
+                df['categoria'] = np.where(
+                    df['category_id'] == category_id, f'categoria {category_id}', 'outras')
+                sns.set_theme(style="whitegrid")
+                plt.rcParams['axes.spines.right'] = False
+                plt.rcParams['axes.spines.left'] = False
+                plt.rcParams['axes.spines.top'] = False
+                plt.rcParams['axes.grid.axis'] = 'y'
+                plt.rcParams['figure.figsize'] = [4, 3]
+                plt.rcParams['svg.fonttype'] = 'none'
+                plt.rcParams['text.color'] = plt.rcParams['xtick.color'] = plt.rcParams['ytick.color'] = 'grey'
+
+                hist = sns.histplot(data=df, x="score",
+                                    hue="categoria", palette=['#00539d', '#8c8c8c'], bins=25, hue_order=[f'categoria {category_id}', "outras"])
+                hist.plot()
+
+                for patch in hist.patches:
+                    if patch.get_x() <= 0.05 < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == '#00539d':
+                        patch.set_facecolor('#f4664a')
 
                 a = stats.ks_2samp(df.loc[df['category_id'] == category_id]['score'],
                                    df.loc[df['category_id'] != category_id]['score'])
