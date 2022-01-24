@@ -6,8 +6,8 @@ from nltk.tokenize import RegexpTokenizer
 
 class Article:
     def __init__(self, headline, body, n_grams=1):
-        self.headline = headline.strip()
-        self.body = body.strip()
+        self.headline = unicodedata.normalize('NFC', headline.strip())
+        self.body = unicodedata.normalize('NFC',  body.strip())
 
         self.headline_as_list = self.preprocess(self.headline)
         self.body_as_list = self.preprocess(self.body)
@@ -26,7 +26,6 @@ class Article:
         pprint(self.__dict__)
 
     def preprocess(self, text):
-        text = unicodedata.normalize('NFC', text)
         tokenizer = RegexpTokenizer(r'[\w\-]+')
         terms = tokenizer.tokenize(text.lower())
         return terms
