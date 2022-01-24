@@ -12,10 +12,11 @@ from inforadar.credibility_metrics.headline_accuracy_metric import HeadlineAccur
 from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
 from inforadar.credibility_metrics.spell_checking_metric import SpellCheckingMetric
 from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
+from inforadar.credibility_metrics.clickbait_metric import ClickbaitMetric
 from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
 from ..constants import current_version_metric_sentiment, current_version_metric_subjectivity, \
-    current_version_metric_spell_checking,current_version_metric_headline_accuracy
+    current_version_metric_spell_checking, current_version_metric_headline_accuracy, current_version_metric_clickbait
 
 
 class Metrics(Resource):
@@ -191,18 +192,22 @@ class Metrics(Resource):
                             "score": score,
                             "version": current_version_metric_headline_accuracy
                         }
+                elif available_metrics[metric_id] == "clickbait":
+                    if not headline:
+                        score = None
+                        message = "Error when computing clickbait. No headline provided."
+                        new_metrics[metric_id] = {"score": score, "message": message}
+                    else:
+                        clickbait_metric = ClickbaitMetric(
+                            constants.fp_clickbait_vectorizer,
+                            constants.fp_clickbait_model)
+                        score = clickbait_metric.compute_metric(headline)
+                        new_metrics[metric_id] = {
+                            "score": score,
+                            "version": current_version_metric_clickbait
+                        }
 
-                else:
-                    # TODO:
-                    # metric_instance = instantiate_metric(metric)
-                    # score = metric_instance.compute_score(article)
-                    score = random.uniform(0, 1)
-                    new_metrics[metric_id] = {
-                        "score": score,
-                        "version": 1
-                    }
-
-                print(new_metrics)
+                # print(new_metrics)
 
         metrics.update(new_metrics)
 
