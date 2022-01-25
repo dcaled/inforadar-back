@@ -38,6 +38,18 @@ class Histogram(Resource):
                         "allowed": available_metrics,
                         "schema": {"type": "integer"}
                         },
+            "metric_scores": {"type": "dict",
+                              "required": False,
+                              "keysrules": {
+                                  "type": "string",
+                                  "allowed": [str(m) for m in available_metrics],
+                              },
+                              "valuesrules": {
+                                  "type": "dict",
+                                  "schema": {
+                                      "score": {"type": "float"}}
+                              },
+                              },
         }
 
         validator = Validator()
@@ -50,6 +62,7 @@ class Histogram(Resource):
         # --------------------------
         data = request.get_json(force=True)
         metric_bins = dict()
+        metric_scores = data.get("metric_scores")
         for metric_id in data.get("metrics"):
             if metric_id == 4:
                 continue
@@ -78,14 +91,13 @@ class Histogram(Resource):
                                     hue="categoria", palette=['#00539d', '#8c8c8c'], bins=25, hue_order=[f'categoria {category_id}', "outras"])
                 hist.plot()
 
-                for patch in hist.patches:
-                    if patch.get_x() <= 0.05 < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == '#00539d':
-                        patch.set_facecolor('#f4664a')
+                if (metric_scores):
+                    for patch in hist.patches:
+                        if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == '#00539d':
+                            patch.set_facecolor('#f4664a')
 
                 ks = stats.ks_2samp(df.loc[df['category_id'] == category_id]['score'],
                                     df.loc[df['category_id'] != category_id]['score'])
-                plt.suptitle(
-                    f'{round(ks.statistic, 3)}, p={round(ks.pvalue, 5)}')
                 plotoutput = io.StringIO()
                 plt.savefig(plotoutput, format='svg')
                 plt.close()
