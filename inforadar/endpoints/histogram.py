@@ -64,8 +64,6 @@ class Histogram(Resource):
         metric_bins = dict()
         metric_scores = data.get("metric_scores")
         for metric_id in data.get("metrics"):
-            if metric_id == 4:
-                continue
             metric_bins[metric_id] = {"categories": dict()}
             for category_id in categories.keys():
                 # Filter our data
@@ -96,8 +94,12 @@ class Histogram(Resource):
                         if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == '#00539d':
                             patch.set_facecolor('#f4664a')
 
-                ks = stats.ks_2samp(df.loc[df['category_id'] == category_id]['score'],
-                                    df.loc[df['category_id'] != category_id]['score'])
+                dfrange_samecat = df.loc[df['category_id'] == category_id]
+                dfrange_notsamecat = df.loc[df['category_id'] != category_id]
+                if (len(dfrange_samecat) and len(dfrange_notsamecat)):
+                    ks = stats.ks_2samp(
+                        dfrange_samecat['score'], dfrange_notsamecat['score'])
+
                 plotoutput = io.StringIO()
                 plt.savefig(plotoutput, format='svg')
                 plt.close()
