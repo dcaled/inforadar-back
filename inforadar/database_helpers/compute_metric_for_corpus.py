@@ -4,6 +4,7 @@ from scipy import spatial
 
 import inforadar.config as config
 from inforadar.article import Article
+from inforadar.credibility_metrics.clickbait_metric import ClickbaitMetric
 from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
 from inforadar.credibility_metrics.spell_checking_metric import SpellCheckingMetric
 from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
@@ -27,6 +28,12 @@ def compute_subjectivity_article(fp_lex_subj, content_stems):
 def compute_spell_checking_article(content):
     spell_checking_metric = SpellCheckingMetric()
     score = spell_checking_metric.compute_metric(text_as_list=content)
+    return score
+
+
+def compute_clickbait_headline(fp_clickbait_vectorizer, fp_clickbait_model, headline):
+    clickbait_metric = ClickbaitMetric(fp_clickbait_vectorizer, fp_clickbait_model)
+    score = clickbait_metric.compute_metric(headline)
     return score
 
 
@@ -56,11 +63,12 @@ def compute_headline_accuracy_article(word_embeddings_model, headline_as_list, b
     return score
 
 
-def insert_article_metrics_scores(id_article, metric_id, score):
+def insert_article_metrics_scores(id_article, metric_id, score, version):
     corpus_metric_score = CorpusMetricScore(
         corpus_article_id=id_article,
         metric_id=metric_id,
-        score=score
+        score=score,
+        version=version
     )
     config.db.session.add(corpus_metric_score)
     config.db.session.commit()
@@ -70,10 +78,12 @@ def main():
     path_to_sentiment_lexicon = "path_to_sentiment_lexicon.pkl"
     path_to_subjectivity_lexicon = "path_to_subjectivity_lexicon.pkl"
     path_to_embedding_weights = "path_to_cbow_s300.txt"
+    path_to_clickbait_vectorizer = 'path_to_clickbait_vectorizer.pk'
+    path_to_clickbait_model = 'path_to_clickbait_model.sav'
 
-    word_embeddings_model = KeyedVectors.load_word2vec_format(path_to_embedding_weights,
-                                                              binary=False,
-                                                              limit=None)
+    # word_embeddings_model = KeyedVectors.load_word2vec_format(path_to_embedding_weights,
+    #                                                           binary=False,
+    #                                                           limit=None)
     metrics = {
         1: "sentiment",
         2: "subjectivity",
@@ -92,21 +102,28 @@ def main():
 
         # Sentiment
         # sentiment_score = compute_sentiment_article(path_to_sentiment_lexicon, content)
-        # insert_article_metrics_scores(corpus_article.id, 1, sentiment_score)
+        # insert_article_metrics_scores(corpus_article.id, 1, sentiment_score, 1)
 
         # Subjectivity
         # subjectivity_score = compute_subjectivity_article(path_to_subjectivity_lexicon, content_stems)
-        # insert_article_metrics_scores(corpus_article.id, 2, subjectivity_score)
+        # insert_article_metrics_scores(corpus_article.id, 2, subjectivity_score, 1)
 
         # Spell checking
         # spell_checking_score = compute_spell_checking_article(content)
-        # insert_article_metrics_scores(corpus_article.id, 3, spell_checking_score)
+        # insert_article_metrics_scores(corpus_article.id, 3, spell_checking_score, 1)
+
+        # Clickbait headline
+        clickbait_headline_score = compute_clickbait_headline(path_to_clickbait_vectorizer,
+                                                              path_to_clickbait_model,
+                                                              article.headline)
+        insert_article_metrics_scores(corpus_article.id, 4, clickbait_headline_score, 1)
+        # print(article.headline, clickbait_headline_score)
 
         # Headline accuracy
-        headline_accuracy_score = compute_headline_accuracy_article(word_embeddings_model,
-                                                                    article.headline_as_list,
-                                                                    article.body_as_list[:100])
-        insert_article_metrics_scores(corpus_article.id, 5, headline_accuracy_score)
+        # headline_accuracy_score = compute_headline_accuracy_article(word_embeddings_model,
+        #                                                             article.headline_as_list,
+        #                                                             article.body_as_list[:100])
+        # insert_article_metrics_scores(corpus_article.id, 5, headline_accuracy_score, 1)
         # print(headline_accuracy_score)
 
 
