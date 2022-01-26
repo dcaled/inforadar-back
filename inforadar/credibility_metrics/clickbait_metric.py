@@ -87,6 +87,6 @@ class ClickbaitMetric(Metric):
         starts_with_num = self.starts_with_num(clean_headline)
 
         tfidf = self.vectorizer.transform([clean_headline]).toarray()
-        print(tfidf)
+        # print(tfidf)
         features = np.hstack((np.array([headline_words, exclamation, starts_with_num, question]), tfidf[0]))
         return features
