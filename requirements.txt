@@ -113,6 +113,7 @@ seaborn=0.11.2
 setuptools=52.0.0
 sgmllib3k=1.0.0
 six=1.16.0
+scikit-learn=1.0.2
 smart_open=1.9.0
 soupsieve=2.0.1
 sqlalchemy=1.4.19
