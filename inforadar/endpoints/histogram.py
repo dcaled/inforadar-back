@@ -23,8 +23,9 @@ class Histogram(Resource):
             record.id: record.name for record in metrics_records}
 
         categories_records = Category.query.with_entities(
-            Category.id, Category.name).all()
-        categories = {record.id: record.name for record in categories_records}
+            Category.id, Category.display_name).all()
+        categories = {
+            record.id: record.display_name.lower() for record in categories_records}
 
         # --------------------------
         # Request validation.
@@ -44,12 +45,23 @@ class Histogram(Resource):
                                   "type": "string",
                                   "allowed": [str(m) for m in available_metrics],
                               },
-                              "valuesrules": {
-                                  "type": "dict",
-                                  "schema": {
-                                      "score": {"type": "float"}}
+                              "valuesrules": {"type": "dict",
+                                              "schema": {
+                                                  "score": {"type": "float"}}
+                                              },
                               },
-                              },
+            "settings": {"type": "dict",
+                         "required": True,
+                         "schema": {
+                             "graphs": {"type": "list",
+                                        "required": True,
+                                        "allowed": ["cumulative", "notcumulative"],
+                                        "schema": {"type": "string"}
+                                        },
+                             "legend": {"type": "boolean",
+                                        "required": True,
+                                        }},
+                         },
         }
 
         validator = Validator()
@@ -63,6 +75,8 @@ class Histogram(Resource):
         data = request.get_json(force=True)
         metric_bins = dict()
         metric_scores = data.get("metric_scores")
+        legend = data.get("settings")["legend"]
+        graphs = data.get("settings")["graphs"]
         for metric_id in data.get("metrics"):
             metric_bins[metric_id] = {"categories": dict()}
             for category_id in categories.keys():
@@ -74,8 +88,8 @@ class Histogram(Resource):
                     .order_by(CorpusMetricScore.score)
 
                 df = pd.read_sql(metricdata.statement, metricdata.session.bind)
-                df['categoria'] = np.where(
-                    df['category_id'] == category_id, f'categoria {category_id}', 'outras')
+                df['coleção'] = np.where(
+                    df['category_id'] == category_id, categories[category_id], 'restantes')
                 sns.set_theme(style="whitegrid")
                 plt.rcParams['axes.spines.right'] = False
                 plt.rcParams['axes.spines.left'] = False
@@ -85,14 +99,40 @@ class Histogram(Resource):
                 plt.rcParams['svg.fonttype'] = 'none'
                 plt.rcParams['text.color'] = plt.rcParams['xtick.color'] = plt.rcParams['ytick.color'] = 'grey'
 
-                hist = sns.histplot(data=df, x="score",
-                                    hue="categoria", palette=['#00539d', '#8c8c8c'], bins=25, hue_order=[f'categoria {category_id}', "outras"])
-                hist.plot()
+                article_color = '#f4664a'
+                collection_color = '#00539d'
+                others_color = '#8c8c8c'
+                palette = ([article_color]
+                           if metric_scores else []) + [collection_color, others_color]
+                hue_order = (["artigo"]
+                             if metric_scores else []) + [categories[category_id], "restantes"]
 
-                if (metric_scores):
-                    for patch in hist.patches:
-                        if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == '#00539d':
-                            patch.set_facecolor('#f4664a')
+                plotoutput_nc = io.StringIO()
+                plotoutput_c = io.StringIO()
+
+                if ("notcumulative" in graphs):
+                    hist_nc = sns.histplot(data=df, x="score",
+                                           legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
+                    hist_nc.plot()
+
+                    if (metric_scores):
+                        for patch in hist_nc.patches:
+                            if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
+                                patch.set_facecolor(article_color)
+                    plt.savefig(plotoutput_nc, format='svg')
+                    plt.close()
+
+                if ("cumulative" in graphs):
+                    hist_c = sns.histplot(data=df, x="score", cumulative=True, common_norm=False, stat="probability",
+                                          legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
+                    hist_c.plot()
+
+                    if (metric_scores):
+                        for patch in hist_c.patches:
+                            if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
+                                patch.set_facecolor(article_color)
+                    plt.savefig(plotoutput_c, format='svg')
+                    plt.close()
 
                 dfrange_samecat = df.loc[df['category_id'] == category_id]
                 dfrange_notsamecat = df.loc[df['category_id'] != category_id]
@@ -100,12 +140,9 @@ class Histogram(Resource):
                     ks = stats.ks_2samp(
                         dfrange_samecat['score'], dfrange_notsamecat['score'])
 
-                plotoutput = io.StringIO()
-                plt.savefig(plotoutput, format='svg')
-                plt.close()
-
                 metric_bins[metric_id]["categories"][category_id] = {
-                    "svg": plotoutput.getvalue(), "ks_2samp": {"stat": ks.statistic, "p": ks.pvalue}}
-                plotoutput.close()
+                    "svg": {"notcumulative": plotoutput_nc.getvalue(), "cumulative": plotoutput_c.getvalue()}, "ks_2samp": {"stat": ks.statistic, "p": ks.pvalue}}
+                plotoutput_nc.close()
+                plotoutput_c.close()
 
         return metric_bins, 200
