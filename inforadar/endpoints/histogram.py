@@ -55,7 +55,7 @@ class Histogram(Resource):
                          "schema": {
                              "graphs": {"type": "list",
                                         "required": True,
-                                        "allowed": ["cumulative", "notcumulative"],
+                                        "allowed": ["count", "cumulative", "notcumulative"],
                                         "schema": {"type": "string"}
                                         },
                              "legend": {"type": "boolean",
@@ -109,9 +109,10 @@ class Histogram(Resource):
 
                 plotoutput_nc = io.StringIO()
                 plotoutput_c = io.StringIO()
+                plotoutput_ct = io.StringIO()
 
                 if ("notcumulative" in graphs):
-                    hist_nc = sns.histplot(data=df, x="score", common_norm=False, stat="probability",
+                    hist_nc = sns.histplot(data=df, x="score", cumulative=False, common_norm=False, stat="probability",
                                            legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
                     hist_nc.plot()
 
@@ -134,6 +135,18 @@ class Histogram(Resource):
                     plt.savefig(plotoutput_c, format='svg')
                     plt.close()
 
+                if ("count" in graphs):
+                    hist_ct = sns.histplot(data=df, x="score", cumulative=False, common_norm=True, stat="count",
+                                           legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
+                    hist_ct.plot()
+
+                    if (metric_scores):
+                        for patch in hist_ct.patches:
+                            if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
+                                patch.set_facecolor(article_color)
+                    plt.savefig(plotoutput_ct, format='svg')
+                    plt.close()
+
                 dfrange_samecat = df.loc[df['category_id'] == category_id]
                 dfrange_notsamecat = df.loc[df['category_id'] != category_id]
                 if (len(dfrange_samecat) and len(dfrange_notsamecat)):
@@ -141,8 +154,9 @@ class Histogram(Resource):
                         dfrange_samecat['score'], dfrange_notsamecat['score'])
 
                 metric_bins[metric_id]["categories"][category_id] = {
-                    "svg": {"notcumulative": plotoutput_nc.getvalue(), "cumulative": plotoutput_c.getvalue()}, "ks_2samp": {"stat": ks.statistic, "p": ks.pvalue}}
+                    "svg": {"notcumulative": plotoutput_nc.getvalue(), "cumulative": plotoutput_c.getvalue(), "count": plotoutput_ct.getvalue()}, "ks_2samp": {"stat": ks.statistic, "p": ks.pvalue}}
                 plotoutput_nc.close()
                 plotoutput_c.close()
+                plotoutput_ct.close()
 
         return metric_bins, 200
