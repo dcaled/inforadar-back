@@ -111,7 +111,7 @@ class Histogram(Resource):
                 plotoutput_c = io.StringIO()
 
                 if ("notcumulative" in graphs):
-                    hist_nc = sns.histplot(data=df, x="score",
+                    hist_nc = sns.histplot(data=df, x="score", common_norm=False, stat="probability",
                                            legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
                     hist_nc.plot()
 
