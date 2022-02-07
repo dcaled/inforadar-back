@@ -3,120 +3,270 @@
 		"1": {
 			"metrics": {
 				"1": {
-					"min": 0,
-					"max": 25
+					"in": {
+						"min": 0,
+						"max": 25
+					},
+					"out": {
+						"min": 50,
+						"max": 100
+					}
 				},
 				"2": {
-					"min": 0,
-					"max": 25
+					"in": {
+						"min": 0,
+						"max": 25
+					},
+					"out": {
+						"min": 50,
+						"max": 100
+					}
 				},
 				"3": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"4": {
-					"min": 0,
-					"max": 25
+					"in": {
+						"min": 0,
+						"max": 25
+					},
+					"out": {
+						"min": 50,
+						"max": 100
+					}
 				},
 				"5": {
-					"min": 75,
-					"max": 100
+					"in": {
+						"min": 75,
+						"max": 100
+					},
+					"out": {
+						"min": 0,
+						"max": 75
+					}
 				}
 			}
 		},
 		"2": {
 			"metrics": {
 				"1": {
-					"min": 25,
-					"max": 100
+					"in": {
+						"min": 25,
+						"max": 100
+					},
+					"out": {
+						"min": 0,
+						"max": 25
+					}
 				},
 				"2": {
-					"min": 25,
-					"max": 100
+					"in": {
+						"min": 25,
+						"max": 100
+					},
+					"out": {
+						"min": 0,
+						"max": 25
+					}
 				},
 				"3": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"4": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"5": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				}
 			}
 		},
 		"3": {
 			"metrics": {
 				"1": {
-					"min": 50,
-					"max": 100
+					"in": {
+						"min": 50,
+						"max": 100
+					},
+					"out": {
+						"min": 0,
+						"max": 50
+					}
 				},
 				"2": {
-					"min": 50,
-					"max": 100
+					"in": {
+						"min": 50,
+						"max": 100
+					},
+					"out": {
+						"min": 0,
+						"max": 50
+					}
 				},
 				"3": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"4": {
-					"min": 50,
-					"max": 100
+					"in": {
+						"min": 50,
+						"max": 100
+					},
+					"out": {
+						"min": 0,
+						"max": 50
+					}
 				},
 				"5": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				}
 			}
 		},
 		"4": {
 			"metrics": {
 				"1": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"2": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"3": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"4": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"5": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				}
 			}
 		},
 		"5": {
 			"metrics": {
 				"1": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"2": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"3": {
-					"min": null,
-					"max": null
+					"in": {
+						"min": null,
+						"max": null
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"4": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				},
 				"5": {
-					"min": 0,
-					"max": 100
+					"in": {
+						"min": 0,
+						"max": 100
+					},
+					"out": {
+						"min": null,
+						"max": null
+					}
 				}
 			}
 		}
