@@ -31,6 +31,23 @@ class ErcSourceSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
 
 
+class UserFeedback(db.Model):
+    __tablename__ = "user_feedback"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, default=0, nullable=False)
+    crowdsourced_article_id = db.Column(db.Integer, db.ForeignKey('crowdsourced_articles.id'), nullable=False)
+    indicator_version = db.Column(db.Integer, nullable=False)
+    suggested_indicator = db.Column(db.Integer, db.ForeignKey('indicators.id'), nullable=False)
+    main_indicator = db.Column(db.Integer, db.ForeignKey('indicators.id'), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
+
+
+class UserFeedbackSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = UserFeedback
+        load_instance = True
+
+
 class Category(db.Model):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
