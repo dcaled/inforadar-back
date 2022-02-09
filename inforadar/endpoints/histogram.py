@@ -1,4 +1,5 @@
 import sys
+import json
 
 from cerberus import Validator
 from flask import request
@@ -13,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import inforadar.config as config
 from inforadar.models import Category, Metric, CorpusMetricScore, CorpusArticle
+from ..constants import cache_histograms
 
 
 class Histogram(Resource):
@@ -77,7 +79,20 @@ class Histogram(Resource):
         metric_scores = data.get("metric_scores")
         legend = data.get("settings")["legend"]
         graphs = data.get("settings")["graphs"]
+        histocache = False
+
+        if (not metric_scores):
+            try:
+                f = open(cache_histograms, 'r')
+                histocache = json.load(f)
+                f.close()
+            except FileNotFoundError:
+                histocache = False
+
         for metric_id in data.get("metrics"):
+            if (histocache):
+                break
+
             metric_bins[metric_id] = {"categories": dict()}
             for category_id in categories.keys():
                 # Filter our data
@@ -158,5 +173,13 @@ class Histogram(Resource):
                 plotoutput_nc.close()
                 plotoutput_c.close()
                 plotoutput_ct.close()
+
+        if (not metric_scores):
+            if (not histocache):
+                f = open(cache_histograms, 'w')
+                json.dump(metric_bins, f)
+                f.close()
+            else:
+                metric_bins = histocache
 
         return metric_bins, 200
