@@ -19,7 +19,8 @@ def main():
         # 1: "sentiment",
         # 2: "subjectivity",
         # 3: "spell_checking",
-        5: "headline_accuracy"
+        4: "clickbait",
+        # 5: "headline_accuracy",
     }
 
     category_ids = Category.query.with_entities(Category.id)
