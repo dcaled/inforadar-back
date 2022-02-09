@@ -112,7 +112,8 @@ class Histogram(Resource):
                 plt.rcParams['axes.grid.axis'] = 'y'
                 plt.rcParams['figure.figsize'] = [4, 3]
                 plt.rcParams['svg.fonttype'] = 'none'
-                plt.rcParams['text.color'] = plt.rcParams['xtick.color'] = plt.rcParams['ytick.color'] = 'grey'
+                plt.rcParams['text.color'] = plt.rcParams['xtick.color'] = plt.rcParams[
+                    'ytick.color'] = plt.rcParams['axes.labelcolor'] = 'grey'
 
                 article_color = '#f4664a'
                 collection_color = '#00539d'
@@ -135,7 +136,8 @@ class Histogram(Resource):
                         for patch in hist_nc.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
-                    plt.savefig(plotoutput_nc, format='svg')
+                    plt.savefig(plotoutput_nc, format='svg',
+                                bbox_inches='tight')
                     plt.close()
 
                 if ("cumulative" in graphs):
@@ -147,7 +149,8 @@ class Histogram(Resource):
                         for patch in hist_c.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
-                    plt.savefig(plotoutput_c, format='svg')
+                    plt.savefig(plotoutput_c, format='svg',
+                                bbox_inches='tight')
                     plt.close()
 
                 if ("count" in graphs):
@@ -159,7 +162,8 @@ class Histogram(Resource):
                         for patch in hist_ct.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
-                    plt.savefig(plotoutput_ct, format='svg')
+                    plt.savefig(plotoutput_ct, format='svg',
+                                bbox_inches='tight')
                     plt.close()
 
                 dfrange_samecat = df.loc[df['category_id'] == category_id]
