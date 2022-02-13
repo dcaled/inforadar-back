@@ -136,6 +136,8 @@ class Histogram(Resource):
                         for patch in hist_nc.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
+                    plt.xlabel('pontuação')
+                    plt.ylabel('probabilidade')
                     plt.savefig(plotoutput_nc, format='svg',
                                 bbox_inches='tight')
                     plt.close()
@@ -149,6 +151,8 @@ class Histogram(Resource):
                         for patch in hist_c.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
+                    plt.xlabel('pontuação')
+                    plt.ylabel('probabilidade acumulada')
                     plt.savefig(plotoutput_c, format='svg',
                                 bbox_inches='tight')
                     plt.close()
@@ -162,6 +166,8 @@ class Histogram(Resource):
                         for patch in hist_ct.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
+                    plt.xlabel('pontuação')
+                    plt.ylabel('nº de artigos')
                     plt.savefig(plotoutput_ct, format='svg',
                                 bbox_inches='tight')
                     plt.close()
