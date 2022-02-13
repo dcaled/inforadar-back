@@ -37,8 +37,8 @@ class UserFeedback(db.Model):
     user_id = db.Column(db.Integer, default=0, nullable=False)
     crowdsourced_article_id = db.Column(db.Integer, db.ForeignKey('crowdsourced_articles.id'), nullable=False)
     indicator_version = db.Column(db.Integer, nullable=False)
-    suggested_indicator = db.Column(db.Integer, db.ForeignKey('indicators.id'), nullable=False)
-    main_indicator = db.Column(db.Integer, db.ForeignKey('indicators.id'), nullable=False)
+    suggested_category = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    main_category = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
 
 
