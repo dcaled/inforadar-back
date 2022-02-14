@@ -1,3 +1,4 @@
+import secrets
 from cerberus import Validator
 from flask import request
 from flask_restful import Resource
@@ -85,6 +86,8 @@ class Feedback(Resource):
         # --------------------------
         # Persist new feedback.
         # --------------------------
+        auth = secrets.token_hex(32)
+
         user_feedback = UserFeedback(
             user_id=0,
             crowdsourced_article_id=article_id,
@@ -92,9 +95,10 @@ class Feedback(Resource):
             suggested_category=data["suggested_category"],
             main_category=main_category_indicator_record.category_id,
             indicator_id=main_category_indicator_record.indicator_id,
+            auth=auth
         )
         config.db.session.add(user_feedback)
         config.db.session.commit()
         config.db.session.refresh(user_feedback)
 
-        return user_feedback.id, 200
+        return {"id": user_feedback.id, "auth": auth}, 200

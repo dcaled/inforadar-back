@@ -41,6 +41,7 @@ class UserFeedback(db.Model):
     main_category = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     indicator_id = db.Column(db.Integer, db.ForeignKey('indicators.id'), nullable=False)
+    auth = db.Column(db.String(64), nullable=False)
 
 
 class UserFeedbackSchema(ma.SQLAlchemyAutoSchema):
