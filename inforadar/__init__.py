@@ -1,6 +1,7 @@
 from flask_restful import Api
 
 from inforadar.config import app
+from inforadar.endpoints.feedback import Feedback
 from inforadar.endpoints.histogram import Histogram
 from inforadar.endpoints.indicators import Indicators
 from inforadar.endpoints.metadata import Metadata
@@ -20,6 +21,7 @@ api.add_resource(SourceChecker, '/api2/source_checker')
 api.add_resource(ExplainableRules, '/api2/explainable_rules')
 api.add_resource(Examples, '/api2/examples')
 api.add_resource(Histogram, '/api2/histogram')
+api.add_resource(Feedback, '/api2/feedback')
 
 
 if __name__ == '__main__':
