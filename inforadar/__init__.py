@@ -5,6 +5,7 @@ from inforadar.endpoints.delete_feedback import DeleteFeedback
 from inforadar.endpoints.feedback import Feedback
 from inforadar.endpoints.histogram import Histogram
 from inforadar.endpoints.indicators import Indicators
+from inforadar.endpoints.me import Me
 from inforadar.endpoints.metadata import Metadata
 from inforadar.endpoints.metrics import Metrics
 from inforadar.endpoints.scrapper import Scraper
@@ -24,6 +25,7 @@ api.add_resource(Examples, '/api2/examples')
 api.add_resource(Histogram, '/api2/histogram')
 api.add_resource(Feedback, '/api2/feedback')
 api.add_resource(DeleteFeedback, '/api2/delete_feedback')
+api.add_resource(Me, '/api2/me')
 
 
 if __name__ == '__main__':
