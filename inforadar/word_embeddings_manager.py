@@ -1,7 +1,7 @@
 import io
 from multiprocessing.managers import BaseManager
 import numpy as np
-from gensim.models import KeyedVectors
+#from gensim.models import KeyedVectors
 
 
 
