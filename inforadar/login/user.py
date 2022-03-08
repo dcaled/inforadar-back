@@ -1,46 +1,43 @@
 from flask import request
 from flask_login import UserMixin
 
+import inforadar.config as config
+from inforadar.models import User
 
-class User(UserMixin):
-    """Simple User class that stores ID, name, and profile image."""
 
-    def __init__(self, ident, name, profile_pic):
+class UserClass(UserMixin):
+    """ User class that stores ID and name and others """
+
+    def __init__(self, ident, google_id, name, annotator, admin):
         self.id = ident
+        self.google_id = google_id
         self.name = name
-        self.profile_pic = profile_pic
-
-    def update(self, name, profile_pic):
-        self.name = name
-        self.profile_pic = profile_pic
+        self.annotator = annotator
+        self.admin = admin
 
 
-# A simple user manager.  A real world application would implement the same
-# interface but using a database as a backing store.  Note that this
-# implementation will behave unexpectedly if the user contacts multiple
-# instances of the application since it is using an in-memory store.
-class UserManager(object):
-    """Simple user manager class.
+# A user manager.
+class UserManager():
 
-    Replace with something that talks to your database instead.
-    """
-
-    def __init__(self):
-        self.known_users = {}
-
-    def add_or_update_google_user(self, google_subscriber_id, name,
-                                  profile_pic):
+    def add_or_get_google_user(google_subscriber_id, name):
         """Add or update user profile info."""
-        if google_subscriber_id in self.known_users:
-            self.known_users[google_subscriber_id].update(name, profile_pic)
-        else:
-            self.known_users[google_subscriber_id] = \
-                User(google_subscriber_id, name, profile_pic)
-        return self.known_users[google_subscriber_id]
 
-    def lookup_user(self, google_subscriber_id):
-        """Lookup user by ID.  Returns User object."""
-        return self.known_users.get(google_subscriber_id)
+        user = User.query.filter_by(google_id=google_subscriber_id).first()
+        if user is None:
+            newuser = User(google_id=google_subscriber_id,
+                           name=name, annotator=False, admin=False)
+            config.db.session.add(newuser)
+            config.db.session.commit()
+            user = UserManager.userclass_from_usermodel(newuser)
+        return user
+
+    def lookup_user(user_id):
+        """Lookup user by ID. Returns User object."""
+        user = User.query.get(user_id)
+        return UserManager.userclass_from_usermodel(user) if user else None
+
+    def userclass_from_usermodel(usermodel):
+        return UserClass(usermodel.id, usermodel.google_id, usermodel.name, usermodel.annotator, usermodel.admin)
 
 
 # Decorator to add CSRF protection to any mutating function.
@@ -61,3 +58,13 @@ def csrf_protection(fn):
         else:
             return "X-Requested-With header missing", 403
     return protected
+
+
+# The user loader looks up a user by their user ID, and is called by
+# flask-login to get the current user from the session. Return None
+# if the user ID isn't valid.
+
+
+@config.login.user_loader
+def user_loader(user_id):
+    return UserManager.lookup_user(user_id)

@@ -6,7 +6,7 @@ from http import HTTPStatus
 import inforadar.config as config
 from inforadar.google_token import validate_id_token
 
-from inforadar.login.user import csrf_protection
+from inforadar.login.user import UserManager, csrf_protection
 
 
 class Me(Resource):
@@ -20,9 +20,11 @@ class Me(Resource):
     @login_required
     def get(self):
         return jsonify({
-            'google_id': current_user.id,
+            'id': current_user.id,
+            'google_id': current_user.google_id,
             'name': current_user.name,
-            'picture': current_user.profile_pic
+            'annotator': current_user.annotator,
+            'admin': current_user.admin,
         })
 
     @csrf_protection
@@ -39,17 +41,15 @@ class Me(Resource):
             return 'Invalid ID token', HTTPStatus.FORBIDDEN
 
         # Get the user info out of the validated identity
-        if ('sub' not in identity or
-                'name' not in identity or
-                'picture' not in identity):
+        if ('sub' not in identity or 'name' not in identity):
             return "Unexpected authorization response", HTTPStatus.FORBIDDEN
 
         # This just adds a new user that hasn't been seen before and assumes it
         # will work, but you could extend the logic to do something different
         # (such as only allow known users, or somehow mark a user as new so
         # your frontend can collect extra profile information).
-        user = config.user_manager.add_or_update_google_user(
-            identity['sub'], identity['name'], identity['picture'])
+        user = UserManager.add_or_get_google_user(
+            identity['sub'], identity['name'])
 
         # Authorize the user:
         login_user(user, remember=True)

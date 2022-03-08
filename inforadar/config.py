@@ -4,7 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 import inforadar.db_data as db_data
-from inforadar.login.user import UserManager
 
 app = Flask(__name__)
 # Configure the SqlAlchemy part of the app instance
@@ -30,14 +29,3 @@ login.init_app(app)
 login.session_protection = 'strong'
 
 app.secret_key = app.config['SECRET_KEY']
-
-user_manager = UserManager()
-
-# The user loader looks up a user by their user ID, and is called by
-# flask-login to get the current user from the session. Return None
-# if the user ID isn't valid.
-
-
-@login.user_loader
-def user_loader(user_id):
-    return user_manager.lookup_user(user_id)

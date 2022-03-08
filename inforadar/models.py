@@ -49,6 +49,20 @@ class UserFeedbackSchema(ma.SQLAlchemyAutoSchema):
         model = UserFeedback
         load_instance = True
 
+class User(db.Model):
+    __tablename__ = "user"
+    id = db.Column(db.Integer, primary_key=True)
+    google_id = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    annotator = db.Column(db.Boolean, nullable=False)
+    admin = db.Column(db.Boolean, nullable=False)
+
+
+class UserSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+        load_instance = True
+
 
 class Category(db.Model):
     __tablename__ = "categories"
