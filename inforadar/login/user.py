@@ -24,12 +24,11 @@ class UserManager():
 
         user = User.query.filter_by(google_id=google_subscriber_id).first()
         if user is None:
-            newuser = User(google_id=google_subscriber_id,
-                           name=name, annotator=False, admin=False)
-            config.db.session.add(newuser)
+            user = User(google_id=google_subscriber_id,
+                        name=name, annotator=False, admin=False)
+            config.db.session.add(user)
             config.db.session.commit()
-            user = UserManager.userclass_from_usermodel(newuser)
-        return user
+        return UserManager.userclass_from_usermodel(user)
 
     def lookup_user(user_id):
         """Lookup user by ID. Returns User object."""
