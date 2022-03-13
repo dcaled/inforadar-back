@@ -4,8 +4,7 @@ from flask_restful import Resource
 
 import inforadar.config as config
 from inforadar.classify.classify import classify_text
-from inforadar.models import Category, Indicator, CorpusIndicatorQuartile, \
-    CrowdsourcedArticle, CrowdsourcedIndicatorScore, IndicatorPercentile, CorpusIndicatorScore, IndicatorSchema
+from inforadar.models import Category, Indicator, CrowdsourcedArticle, CrowdsourcedIndicatorScore, IndicatorSchema
 from ..constants import current_version_indicator_1
 
 
