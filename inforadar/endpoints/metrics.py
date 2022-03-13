@@ -1,4 +1,3 @@
-import random
 from multiprocessing.managers import BaseManager
 
 from cerberus import Validator
@@ -13,7 +12,7 @@ from inforadar.credibility_metrics.sentiment_metric import SentimentMetric
 from inforadar.credibility_metrics.spell_checking_metric import SpellCheckingMetric
 from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
 from inforadar.credibility_metrics.clickbait_metric import ClickbaitMetric
-from inforadar.models import Category, Metric, CorpusMetricQuartile, CrowdsourcedArticle, \
+from inforadar.models import Category, Metric, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
 from ..constants import current_version_metric_sentiment, current_version_metric_subjectivity, \
     current_version_metric_spell_checking, current_version_metric_headline_accuracy, current_version_metric_clickbait
@@ -27,33 +26,30 @@ class Metrics(Resource):
         (fact, opinion, conspiracy, entertainment, and satire).
         """
 
-        records = CorpusMetricQuartile.query \
-            .join(Category, Category.id == CorpusMetricQuartile.category_id) \
-            .add_columns(Metric.id.label("metric_id"), Metric.name.label("metric_name"),
-                         Metric.display_name.label("metric_display_name"), Metric.description,
-                         Category.id.label("category_id"),
-                         # CorpusMetricQuartile.first_quartile,
-                         # CorpusMetricQuartile.second_quartile,
-                         # CorpusMetricQuartile.third_quartile
-                         ).all()
-        # .join(Metric, Metric.id == CorpusMetricQuartile.metric_id) \
+        categories_records = Category.query.with_entities(Category.id, Category.name).all()
+        categories = {record.id: record.name for record in categories_records}
+
+        metrics_records = Metric.query.with_entities(
+            Metric.id, Metric.name, Metric.display_name, Metric.description).all()
+        available_metrics = {record.id: record.name for record in metrics_records}
 
         metrics = dict()
-        for record in records:
-            if record.metric_id not in metrics:
-                metrics[record.metric_id] = {
-                    "id": record.metric_id,
-                    "name": record.metric_name,
-                    "display_name": record.metric_display_name,
-                    "description": record.description,
-                    "categories": dict()
-                }
-            metrics[record.metric_id]["categories"][record.category_id] = {
-                "first_quartile": 25,  # record.first_quartile,
-                "second_quartile": 50,  # record.second_quartile,
-                "third_quartile": 75,  # record.third_quartile,
-                "fourth_quartile": 100  # record.fourth_quartile
+        for metric in available_metrics:
+            metrics[metric.id] = {
+                "id": metric.id,
+                "name": metric.name,
+                "display_name": metric.display_name,
+                "description": metric.description,
+                "categories": dict()
             }
+
+            for category in categories:
+                metrics[metric.id]["categories"][category.category_id] = {
+                    "first_quartile": 25,
+                    "second_quartile": 50,
+                    "third_quartile": 75,
+                    "fourth_quartile": 100
+                }
 
         metrics = list(metrics.values())
         return metrics, 200
