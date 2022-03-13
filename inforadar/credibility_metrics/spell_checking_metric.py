@@ -1,5 +1,6 @@
 from spellchecker import SpellChecker
 from .metric import Metric
+from inforadar.lexica.processed import vocabulary_additional_words
 
 
 class SpellCheckingMetric(Metric):
@@ -7,11 +8,7 @@ class SpellCheckingMetric(Metric):
     def __init__(self):
         super().__init__()
         self.spell_portuguese = SpellChecker(language="pt")
-        self.spell_portuguese.word_frequency.load_words(
-            ["marcelo", "rebelo", "covid", "covid-19", "oms", "sars-cov", "pfizer",
-             "bolsonaro", "covid-19", "https", "huawei", "coronavírus", "5g", "biden", "hidroxicloroquina",
-             "lisboa",
-             "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira"])
+        self.spell_portuguese.word_frequency.load_words(vocabulary_additional_words.additional_words)
 
     def create_lexicon(self, raw_file_path):
         pass
