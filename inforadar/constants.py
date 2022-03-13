@@ -46,8 +46,10 @@ cache_histograms = "inforadar/util/histocache.json"
 current_version_indicator_1 = 1
 
 # Metrics current version
-current_version_metric_clickbait = 1
-current_version_metric_sentiment = 1
-current_version_metric_subjectivity = 1
-current_version_metric_spell_checking = 1
-current_version_metric_headline_accuracy = 1
+metrics_current_version = {
+    "sentiment": 1,
+    "subjectivity": 1,
+    "spell_checking": 2,
+    "headline_accuracy": 1,
+    "clickbait": 1
+}

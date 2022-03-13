@@ -14,8 +14,7 @@ from inforadar.credibility_metrics.subjectivity_metric import SubjectivityMetric
 from inforadar.credibility_metrics.clickbait_metric import ClickbaitMetric
 from inforadar.models import Category, Metric, CrowdsourcedArticle, \
     CrowdsourcedMetricScore, MetricPercentile, CorpusMetricScore
-from ..constants import current_version_metric_sentiment, current_version_metric_subjectivity, \
-    current_version_metric_spell_checking, current_version_metric_headline_accuracy, current_version_metric_clickbait
+from ..constants import metrics_current_version
 
 
 class Metrics(Resource):
@@ -27,14 +26,11 @@ class Metrics(Resource):
         """
 
         categories_records = Category.query.with_entities(Category.id, Category.name).all()
-        categories = {record.id: record.name for record in categories_records}
-
         metrics_records = Metric.query.with_entities(
             Metric.id, Metric.name, Metric.display_name, Metric.description).all()
-        available_metrics = {record.id: record.name for record in metrics_records}
 
         metrics = dict()
-        for metric in available_metrics:
+        for metric in metrics_records:
             metrics[metric.id] = {
                 "id": metric.id,
                 "name": metric.name,
@@ -43,8 +39,8 @@ class Metrics(Resource):
                 "categories": dict()
             }
 
-            for category in categories:
-                metrics[metric.id]["categories"][category.category_id] = {
+            for category in categories_records:
+                metrics[metric.id]["categories"][category.id] = {
                     "first_quartile": 25,
                     "second_quartile": 50,
                     "third_quartile": 75,
@@ -111,17 +107,22 @@ class Metrics(Resource):
             headline = article.headline
             body_text = article.body_text
 
-            # TODO: Attention: when a new version of the indicators calculator is released, you should update this
-            #  query to retrieve the score of the current indicator calculator.
             metrics_records = CrowdsourcedArticle.query \
                 .join(CrowdsourcedMetricScore,
                       CrowdsourcedMetricScore.crowdsourced_article_id == CrowdsourcedArticle.id) \
-                .add_columns(CrowdsourcedMetricScore.metric_id, CrowdsourcedMetricScore.score) \
+                .join(Metric,
+                      Metric.id == CrowdsourcedMetricScore.metric_id) \
+                .add_columns(CrowdsourcedMetricScore.metric_id,
+                             CrowdsourcedMetricScore.score,
+                             CrowdsourcedMetricScore.version,
+                             Metric.name) \
                 .filter(CrowdsourcedArticle.id == article.id) \
                 .filter(CrowdsourcedMetricScore.metric_id.in_(data["metrics"])).all()
 
+            # Filter outdated metrics.
             for record in metrics_records:
-                metrics[record.metric_id] = {"score": record.score}
+                if record.version == metrics_current_version[record.name]:
+                    metrics[record.metric_id] = {"score": record.score}
             article_id = article.id
 
         else:
@@ -145,7 +146,7 @@ class Metrics(Resource):
                     score = sentiment_metric.compute_metric(text_as_list=content)
                     new_metrics[metric_id] = {
                         "score": score,
-                        "version": current_version_metric_sentiment
+                        "version": metrics_current_version["sentiment"]
                     }
 
                 elif available_metrics[metric_id] == "subjectivity":
@@ -154,7 +155,7 @@ class Metrics(Resource):
                     score = subjectivity_metric.compute_metric(text_as_list=content_stems)
                     new_metrics[metric_id] = {
                         "score": score,
-                        "version": current_version_metric_subjectivity
+                        "version": metrics_current_version["subjectivity"]
                     }
 
                 elif available_metrics[metric_id] == "spell_checking":
@@ -162,7 +163,7 @@ class Metrics(Resource):
                     score = spell_checking_metric.compute_metric(text_as_list=content)
                     new_metrics[metric_id] = {
                         "score": score,
-                        "version": current_version_metric_spell_checking
+                        "version": metrics_current_version["spell_checking"]
                     }
 
                 elif available_metrics[metric_id] == "headline_accuracy":
@@ -186,7 +187,7 @@ class Metrics(Resource):
                                                                         body_text=art.body_as_list[:100])
                         new_metrics[metric_id] = {
                             "score": score,
-                            "version": current_version_metric_headline_accuracy
+                            "version": metrics_current_version["headline_accuracy"]
                         }
                 elif available_metrics[metric_id] == "clickbait":
                     if not headline:
@@ -200,7 +201,7 @@ class Metrics(Resource):
                         score = clickbait_metric.compute_metric(headline)
                         new_metrics[metric_id] = {
                             "score": score,
-                            "version": current_version_metric_clickbait
+                            "version": metrics_current_version["clickbait"]
                         }
 
                 # print(new_metrics)
