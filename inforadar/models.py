@@ -268,8 +268,9 @@ class MetricPercentile(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     corpus_metric_score_id = db.Column(db.Integer, db.ForeignKey('corpus_metrics_scores.id'), nullable=False)
     percentile = db.Column(db.Float, nullable=False)
+    version = db.Column(db.Integer, nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('metric_id', 'category_id', 'corpus_metric_score_id'),
+        db.UniqueConstraint('metric_id', 'category_id', 'corpus_metric_score_id', 'version'),
     )
 
 
@@ -286,8 +287,9 @@ class IndicatorPercentile(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     corpus_indicator_score_id = db.Column(db.Integer, db.ForeignKey('corpus_indicators_scores.id'), nullable=False)
     percentile = db.Column(db.Float, nullable=False)
+    version = db.Column(db.Integer, nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('indicator_id', 'category_id', 'corpus_indicator_score_id'),
+        db.UniqueConstraint('indicator_id', 'category_id', 'corpus_indicator_score_id', version),
     )
 
 
