@@ -172,7 +172,7 @@ class CrowdsourcedMetricScore(db.Model):
     version = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('metric_id', 'crowdsourced_article_id'),
+        db.UniqueConstraint('metric_id', 'crowdsourced_article_id', 'version'),
     )
 
 
@@ -192,7 +192,7 @@ class CrowdsourcedIndicatorScore(db.Model):
     version = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('indicator_id', 'crowdsourced_article_id', 'category_id'),
+        db.UniqueConstraint('indicator_id', 'crowdsourced_article_id', 'category_id', version),
     )
 
 
@@ -230,7 +230,7 @@ class CorpusMetricScore(db.Model):
     version = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('corpus_article_id', 'metric_id'),
+        db.UniqueConstraint('corpus_article_id', 'metric_id', 'version'),
     )
 
 
@@ -250,7 +250,7 @@ class CorpusIndicatorScore(db.Model):
     version = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('corpus_article_id', 'indicator_id'),
+        db.UniqueConstraint('corpus_article_id', 'indicator_id', 'version'),
     )
 
 
