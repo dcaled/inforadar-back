@@ -67,8 +67,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 class ArticleAnnotationReply(db.Model):
     __tablename__ = "article_annotation_reply"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     article_id = db.Column(db.Integer, db.ForeignKey(
         'corpus_articles.id'), nullable=False)
     likely_being_factual = db.Column(db.Integer, default=0, nullable=False)
