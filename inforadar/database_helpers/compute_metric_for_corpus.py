@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 from gensim.models import KeyedVectors
 from scipy import spatial
@@ -25,8 +27,9 @@ def compute_subjectivity_article(fp_lex_subj, content_stems):
     return score
 
 
-def compute_spell_checking_article(content):
+def compute_spell_checking_article(fp_extended_vocabulary, content):
     spell_checking_metric = SpellCheckingMetric()
+    spell_checking_metric.load_lexicon(fp_extended_vocabulary)
     score = spell_checking_metric.compute_metric(text_as_list=content)
     return score
 
@@ -80,6 +83,7 @@ def main():
     path_to_embedding_weights = "path_to_cbow_s300.txt"
     path_to_clickbait_vectorizer = 'path_to_clickbait_vectorizer.pk'
     path_to_clickbait_model = 'path_to_clickbait_model.sav'
+    path_to_extended_vocabulary = 'path_to_extended_vocabulary.pkl'
 
     # word_embeddings_model = KeyedVectors.load_word2vec_format(path_to_embedding_weights,
     #                                                           binary=False,
@@ -109,14 +113,15 @@ def main():
         # insert_article_metrics_scores(corpus_article.id, 2, subjectivity_score, 1)
 
         # Spell checking
-        # spell_checking_score = compute_spell_checking_article(content)
-        # insert_article_metrics_scores(corpus_article.id, 3, spell_checking_score, 1)
+        spell_checking_score = compute_spell_checking_article(path_to_extended_vocabulary, content)
+        # print(spell_checking_score)
+        insert_article_metrics_scores(corpus_article.id, 3, spell_checking_score, 2)
 
         # Clickbait headline
-        clickbait_headline_score = compute_clickbait_headline(path_to_clickbait_vectorizer,
-                                                              path_to_clickbait_model,
-                                                              article.headline)
-        insert_article_metrics_scores(corpus_article.id, 4, clickbait_headline_score, 1)
+        # clickbait_headline_score = compute_clickbait_headline(path_to_clickbait_vectorizer,
+        #                                                       path_to_clickbait_model,
+        #                                                       article.headline)
+        # insert_article_metrics_scores(corpus_article.id, 4, clickbait_headline_score, 1)
         # print(article.headline, clickbait_headline_score)
 
         # Headline accuracy
