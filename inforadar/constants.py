@@ -29,6 +29,9 @@ fp_lex_sent = "{}processed/sentiment.pkl".format(base_dir)
 # fp_lex_raw_subj = '{}subjectivity-clues-pt.csv'.format(base_dir)
 fp_lex_subj = "{}processed/subjectivity.pkl".format(base_dir)
 
+# Extended vocabulary
+fp_extended_vocabulary = "{}extended_vocabulary_20.pkl".format(base_dir)
+
 # Embeddings path
 fp_emb_matrix = "{}cbow_s300.txt".format(base_dir)
 
@@ -53,3 +56,4 @@ metrics_current_version = {
     "headline_accuracy": 1,
     "clickbait": 1
 }
+
