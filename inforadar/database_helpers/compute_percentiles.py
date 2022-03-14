@@ -3,6 +3,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 import inforadar.db_data as db_data
+from inforadar.constants import metrics_current_version
 from inforadar.models import Category, CorpusMetricScore, CorpusArticle
 
 
@@ -18,8 +19,8 @@ def main():
     metrics = {
         # 1: "sentiment",
         # 2: "subjectivity",
-        # 3: "spell_checking",
-        4: "clickbait",
+        3: "spell_checking",
+        # 4: "clickbait",
         # 5: "headline_accuracy",
     }
 
@@ -28,6 +29,7 @@ def main():
     for category_id in category_ids:
         category_id = category_id[0]
         for metric_id in metrics.keys():
+            version = metrics_current_version[metrics[metric_id]]
             records = CorpusMetricScore.query \
                 .join(CorpusArticle, CorpusArticle.id == CorpusMetricScore.corpus_article_id) \
                 .filter(CorpusMetricScore.metric_id == metric_id) \
@@ -41,6 +43,7 @@ def main():
             print(records)
             df = pd.read_sql(records.statement, records.session.bind)
             df['percentile'] = pd.qcut(df['score'] + jitter(df['score']), q=100, labels=False)
+            df['version'] = version
 
             print(df)
             df = df.drop(columns=['score'])
