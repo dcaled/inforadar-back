@@ -160,6 +160,7 @@ class Metrics(Resource):
 
                 elif available_metrics[metric_id] == "spell_checking":
                     spell_checking_metric = SpellCheckingMetric()
+                    spell_checking_metric.load_lexicon(constants.fp_extended_vocabulary)
                     score = spell_checking_metric.compute_metric(text_as_list=content)
                     new_metrics[metric_id] = {
                         "score": score,
