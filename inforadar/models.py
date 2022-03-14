@@ -67,43 +67,31 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 class ArticleAnnotationReply(db.Model):
     __tablename__ = "article_annotation_reply"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id'), nullable=False)
-    article_id = db.Column(db.Integer, db.ForeignKey(
-        'corpus_articles.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    corpus_article_id = db.Column(db.Integer, db.ForeignKey('corpus_articles.id'), nullable=False)
     likely_being_factual = db.Column(db.Integer, default=0, nullable=False)
     likely_being_opinion = db.Column(db.Integer, default=0, nullable=False)
-    likely_being_entertainment = db.Column(
-        db.Integer, default=0, nullable=False)
+    likely_being_entertainment = db.Column(db.Integer, default=0, nullable=False)
     likely_being_satire = db.Column(db.Integer, default=0, nullable=False)
     likely_being_conspiracy = db.Column(db.Integer, default=0, nullable=False)
     pre_credibility = db.Column(db.Integer, default=0, nullable=False)
-    change_perception = db.Column(db.Integer, default=0, nullable=False)
-    info_useful = db.Column(db.Integer, default=0, nullable=False)
-    info_reflected_in_subjectivity = db.Column(
-        db.Integer, default=0, nullable=False)
-    relevance_of_subjectivity = db.Column(
-        db.Integer, default=0, nullable=False)
-    info_reflected_in_spell_checking = db.Column(
-        db.Integer, default=0, nullable=False)
-    relevance_of_spell_checking = db.Column(
-        db.Integer, default=0, nullable=False)
-    info_reflected_in_sentiment = db.Column(
-        db.Integer, default=0, nullable=False)
+    change_in_perception = db.Column(db.Integer, default=0, nullable=False)
+    info_is_useful = db.Column(db.Integer, default=0, nullable=False)
+    info_reflected_in_sentiment = db.Column(db.Integer, default=0, nullable=False)
     relevance_of_sentiment = db.Column(db.Integer, default=0, nullable=False)
-    info_reflected_in_headline_accuracy = db.Column(
-        db.Integer, default=0, nullable=False)
-    relevance_of_headline_accuracy = db.Column(
-        db.Integer, default=0, nullable=False)
-    info_reflected_in_clickbait = db.Column(
-        db.Integer, default=0, nullable=False)
+    info_reflected_in_subjectivity = db.Column(db.Integer, default=0, nullable=False)
+    relevance_of_subjectivity = db.Column(db.Integer, default=0, nullable=False)
+    info_reflected_in_spell_checking = db.Column(db.Integer, default=0, nullable=False)
+    relevance_of_spell_checking = db.Column(db.Integer, default=0, nullable=False)
+    info_reflected_in_headline_accuracy = db.Column(db.Integer, default=0, nullable=False)
+    relevance_of_headline_accuracy = db.Column(db.Integer, default=0, nullable=False)
+    info_reflected_in_clickbait = db.Column(db.Integer, default=0, nullable=False)
     relevance_of_clickbait = db.Column(db.Integer, default=0, nullable=False)
-    most_relevant = db.Column(db.Integer, default=0, nullable=False)
-    least_relevant = db.Column(db.Integer, default=0, nullable=False)
-    created_at = db.Column(
-        db.DateTime, server_default=db.func.now(), nullable=False)
+    most_relevant_metric = db.Column(db.Integer, db.ForeignKey('metrics.id'), nullable=False)
+    least_relevant_metric = db.Column(db.Integer, db.ForeignKey('metrics.id'), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     __table_args__ = (
-        db.UniqueConstraint('user_id', 'article_id'),
+        db.UniqueConstraint('user_id', 'corpus_article_id'),
     )
 
 
@@ -116,17 +104,15 @@ class ArticleAnnotationReplySchema(ma.SQLAlchemyAutoSchema):
 class SocioDemographicReply(db.Model):
     __tablename__ = "sociodemographic_reply"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'user.id'), unique=True, nullable=False)
-    age = db.Column(db.Integer, default=0, nullable=False)
-    cs_qualifications = db.Column(db.Integer, default=0, nullable=False)
-    job = db.Column(db.Integer, default=0, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
     nationality = db.Column(db.Integer, default=0, nullable=False)
+    age = db.Column(db.Integer, default=0, nullable=False)
     qualifications = db.Column(db.Integer, default=0, nullable=False)
+    cs_qualifications = db.Column(db.Boolean, nullable=True)
+    job = db.Column(db.Integer, default=0, nullable=False)
     consumed_content = db.Column(db.String(50), default=0, nullable=False)
     news_consumption = db.Column(db.Integer, default=0, nullable=False)
-    created_at = db.Column(
-        db.DateTime, server_default=db.func.now(), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
 
 
 class SocioDemographicReplySchema(ma.SQLAlchemyAutoSchema):
