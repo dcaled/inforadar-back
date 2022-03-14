@@ -122,7 +122,7 @@ class Metrics(Resource):
             # Filter outdated metrics.
             for record in metrics_records:
                 if record.version == metrics_current_version[record.name]:
-                    metrics[record.metric_id] = {"score": record.score}
+                    metrics[record.metric_id] = {"score": record.score, "version": record.version}
             article_id = article.id
 
         else:
@@ -235,6 +235,7 @@ class Metrics(Resource):
                         .add_columns(MetricPercentile.percentile) \
                         .filter(MetricPercentile.metric_id == metric_id) \
                         .filter(MetricPercentile.category_id == category_id) \
+                        .filter(MetricPercentile.version == metrics[metric_id]["version"]) \
                         .filter(CorpusMetricScore.score <= metrics[metric_id]["score"]) \
                         .order_by(CorpusMetricScore.score.desc()) \
                         .first()
