@@ -4,6 +4,7 @@ from flask_login import login_user, login_required, logout_user
 from flask_login import current_user
 from http import HTTPStatus
 import inforadar.config as config
+from inforadar.endpoints.sociodemographic import SocioDemographic
 from inforadar.google_token import validate_id_token
 
 from inforadar.login.user import UserManager, csrf_protection
@@ -25,6 +26,7 @@ class Me(Resource):
             'name': current_user.name,
             'annotator': current_user.annotator,
             'admin': current_user.admin,
+            'sociodemographic': SocioDemographic.get(),
         })
 
     @csrf_protection
