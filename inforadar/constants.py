@@ -57,3 +57,5 @@ metrics_current_version = {
     "clickbait": 1
 }
 
+# Articles to be annotated
+golden_collection_ids = set(range(10))

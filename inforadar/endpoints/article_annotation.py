@@ -1,3 +1,4 @@
+import random
 import inforadar.config as config
 from cerberus import Validator
 from flask import request
@@ -5,9 +6,29 @@ from flask_login import current_user, login_required
 from flask_restful import Resource
 from inforadar.login.user import csrf_protection
 from inforadar.models import ArticleAnnotationReply
+from ..constants import golden_collection_ids
 
 
 class ArticleAnnotation(Resource):
+
+    @login_required
+    @csrf_protection
+    def get(self):
+        annotated_articles = ArticleAnnotationReply.query \
+                .filter(ArticleAnnotationReply.user_id == current_user.id) \
+                .with_entities(ArticleAnnotationReply.corpus_article_id).all()
+
+        annotated_articles_ids = set()
+        # Add the ids of articles already annotated to a set.
+        for article in annotated_articles:
+            annotated_articles_ids.add(article.corpus_article_id)
+
+        # Create a set containing the ids of articles that were not annotated.
+        non_annotated_article_ids = golden_collection_ids.difference(annotated_articles_ids)
+        selected_article_id = random.choice(tuple(non_annotated_article_ids))
+
+        return selected_article_id
+
 
     @login_required
     @csrf_protection
