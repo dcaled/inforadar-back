@@ -2,6 +2,7 @@ import secrets
 from cerberus import Validator
 from flask import request
 from flask_restful import Resource
+from flask_login import current_user
 
 import inforadar.config as config
 from inforadar.models import Category, Indicator, CrowdsourcedArticle, CrowdsourcedIndicatorScore, UserFeedback
@@ -89,7 +90,7 @@ class Feedback(Resource):
         auth = secrets.token_hex(32)
 
         user_feedback = UserFeedback(
-            user_id=0,
+            user_id=current_user.id if current_user.is_authenticated else 0,
             crowdsourced_article_id=article_id,
             indicator_version=main_category_indicator_record.version,
             suggested_category=data["suggested_category"],
@@ -102,3 +103,49 @@ class Feedback(Resource):
         config.db.session.refresh(user_feedback)
 
         return {"id": user_feedback.id, "auth": auth}, 200
+
+    def delete(self):
+        """
+        Input: feedback id and feedback auth.
+        """
+
+        # --------------------------
+        # Request validation.
+        # --------------------------
+        if not request.data:
+            return {'message': f"Missing a JSON body in the request."}, 422
+
+        schema = {
+            "id": {"type": "integer", "required": True},
+            "auth": {"type": "string",
+                     "required": True,
+                     },
+        }
+
+        validator = Validator()
+        valid = validator(request.get_json(force=True), schema)
+        if not valid:
+            return {'message': f"Unsupported json object: " + str(validator.errors)}, 400
+
+        data = request.get_json(force=True)
+
+        # --------------------------
+        # Retrieve existing indicators.
+        # --------------------------
+
+        feedback = UserFeedback.query.filter_by(
+            id=data["id"]).first()
+        if not feedback:
+            return {'message': f"Invalid feedback id: {str(data['id'])}."}, 400
+
+        if feedback.auth != data["auth"]:
+            return {'message': f"Wrong authentication. You cannot delete this."}, 400
+
+        # --------------------------
+        # Persist new feedback.
+        # --------------------------
+
+        config.db.session.delete(feedback)
+        config.db.session.commit()
+
+        return "", 204
