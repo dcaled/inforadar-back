@@ -12,11 +12,10 @@ from ..constants import golden_collection_ids
 class ArticleAnnotation(Resource):
 
     @login_required
-    @csrf_protection
     def get(self):
         annotated_articles = ArticleAnnotationReply.query \
-                .filter(ArticleAnnotationReply.user_id == current_user.id) \
-                .with_entities(ArticleAnnotationReply.corpus_article_id).all()
+            .filter(ArticleAnnotationReply.user_id == current_user.id) \
+            .with_entities(ArticleAnnotationReply.corpus_article_id).all()
 
         annotated_articles_ids = set()
         # Add the ids of articles already annotated to a set.
@@ -24,11 +23,11 @@ class ArticleAnnotation(Resource):
             annotated_articles_ids.add(article.corpus_article_id)
 
         # Create a set containing the ids of articles that were not annotated.
-        non_annotated_article_ids = golden_collection_ids.difference(annotated_articles_ids)
+        non_annotated_article_ids = golden_collection_ids.difference(
+            annotated_articles_ids)
         selected_article_id = random.choice(tuple(non_annotated_article_ids))
 
         return selected_article_id
-
 
     @login_required
     @csrf_protection

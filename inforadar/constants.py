@@ -58,4 +58,4 @@ metrics_current_version = {
 }
 
 # Articles to be annotated
-golden_collection_ids = set(range(10))
+golden_collection_ids = set(range(1, 10))
