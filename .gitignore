@@ -148,3 +148,6 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/python
 /inforadar/classify/best_model_state_text.bin
 inforadar/util/histocache.json
+config_secrets.py
+inforadar/lexica/cbow_s300.zip
+.vscode/
