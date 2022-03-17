@@ -128,7 +128,7 @@ class Histogram(Resource):
                 plotoutput_ct = io.StringIO()
 
                 if ("notcumulative" in graphs):
-                    hist_nc = sns.histplot(data=df, x="score", cumulative=False, common_norm=False, stat="probability",
+                    hist_nc = sns.histplot(data=df, x="score", cumulative=False, kde=True, common_norm=False, stat="probability",
                                            legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
                     hist_nc.plot()
 
@@ -136,6 +136,9 @@ class Histogram(Resource):
                         for patch in hist_nc.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
+                                patch.set_width(patch.get_width() * 0.5)
+                            else:
+                                patch.set_visible(False)
                     plt.xlabel('pontuação')
                     plt.ylabel('probabilidade')
                     plt.savefig(plotoutput_nc, format='svg',
@@ -143,7 +146,7 @@ class Histogram(Resource):
                     plt.close()
 
                 if ("cumulative" in graphs):
-                    hist_c = sns.histplot(data=df, x="score", cumulative=True, common_norm=False, stat="probability",
+                    hist_c = sns.histplot(data=df, x="score", cumulative=True, kde=True, common_norm=False, stat="probability",
                                           legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
                     hist_c.plot()
 
@@ -151,6 +154,8 @@ class Histogram(Resource):
                         for patch in hist_c.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
+                            else:
+                                patch.set_visible(False)
                     plt.xlabel('pontuação')
                     plt.ylabel('probabilidade acumulada')
                     plt.savefig(plotoutput_c, format='svg',
@@ -158,7 +163,7 @@ class Histogram(Resource):
                     plt.close()
 
                 if ("count" in graphs):
-                    hist_ct = sns.histplot(data=df, x="score", cumulative=False, common_norm=True, stat="count",
+                    hist_ct = sns.histplot(data=df, x="score", cumulative=False, kde=True, common_norm=True, stat="count",
                                            legend=legend, hue="coleção", palette=palette, bins=25, hue_order=hue_order)
                     hist_ct.plot()
 
@@ -166,6 +171,8 @@ class Histogram(Resource):
                         for patch in hist_ct.patches:
                             if patch.get_x() <= metric_scores[str(metric_id)]['score'] < patch.get_x() + patch.get_width() and colors.to_hex(patch.get_facecolor()) == collection_color:
                                 patch.set_facecolor(article_color)
+                            else:
+                                patch.set_visible(False)
                     plt.xlabel('pontuação')
                     plt.ylabel('nº de artigos')
                     plt.savefig(plotoutput_ct, format='svg',
