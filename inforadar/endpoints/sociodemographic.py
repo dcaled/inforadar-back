@@ -24,6 +24,7 @@ class SocioDemographic(Resource):
             "cs_qualifications": {"type": "integer", "required": True},
             "job": {"type": "integer", "required": True},
             "nationality": {"type": "integer", "required": True},
+            "gender": {"type": "integer", "required": True},
             "qualifications": {"type": "integer", "required": True},
             "consumed_content": {"type": "list", "required": True},
             "news_consumption": {"type": "integer", "required": True},
@@ -45,6 +46,7 @@ class SocioDemographic(Resource):
             cs_qualifications=data["cs_qualifications"],
             job=data["job"],
             nationality=data["nationality"],
+            gender=data["gender"],
             qualifications=data["qualifications"],
             consumed_content=str(data["consumed_content"]),
             news_consumption=data["news_consumption"]

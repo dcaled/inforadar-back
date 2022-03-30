@@ -106,6 +106,7 @@ class SocioDemographicReply(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
     nationality = db.Column(db.Integer, default=0, nullable=False)
+    gender = db.Column(db.Integer, default=0, nullable=False)
     age = db.Column(db.Integer, default=0, nullable=False)
     qualifications = db.Column(db.Integer, default=0, nullable=False)
     cs_qualifications = db.Column(db.Boolean, nullable=True)
