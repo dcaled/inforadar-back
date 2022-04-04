@@ -103,11 +103,15 @@ class Indicators(Resource):
         # Compute score for each indicator.
         # --------------------------
         new_indicators = dict()
-        for indicator_id in data.get("indicators"):
-            if indicator_id not in indicators.keys():
-                scores = classify_text(body_text)
-                new_indicators[indicator_id] = scores
-        indicators.update(new_indicators)
+        try:
+            for indicator_id in data.get("indicators"):
+                if indicator_id not in indicators.keys():
+                    scores = classify_text(body_text)
+                    new_indicators[indicator_id] = scores
+            indicators.update(new_indicators)
+        except Exception as err:
+            print(err)
+            return {'message': f"Failed to compute score for indicators."}, 500
 
         # --------------------------
         # Persist new indicators.
