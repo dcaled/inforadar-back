@@ -57,6 +57,7 @@ class ArticleAnnotation(Resource):
             "relevance_of_clickbait": {"type": "integer", "required": True},
             "most_relevant_metric": {"type": "integer", "required": True},
             "least_relevant_metric": {"type": "integer", "required": True},
+            "time_taken":  {"type": "integer", "required": True},
         }
 
         validator = Validator()
@@ -89,6 +90,7 @@ class ArticleAnnotation(Resource):
             relevance_of_clickbait=data["relevance_of_clickbait"],
             most_relevant_metric=data["most_relevant_metric"],
             least_relevant_metric=data["least_relevant_metric"],
+            time_taken=data["time_taken"],
         )
 
         config.db.session.add(article_annotation_reply)

@@ -28,6 +28,7 @@ class SocioDemographic(Resource):
             "qualifications": {"type": "integer", "required": True},
             "consumed_content": {"type": "list", "required": True},
             "news_consumption": {"type": "integer", "required": True},
+            "time_taken": {"type": "integer", "required": True},
         }
 
         validator = Validator()
@@ -49,7 +50,8 @@ class SocioDemographic(Resource):
             gender=data["gender"],
             qualifications=data["qualifications"],
             consumed_content=str(data["consumed_content"]),
-            news_consumption=data["news_consumption"]
+            news_consumption=data["news_consumption"],
+            time_taken=data["time_taken"],
         )
 
         config.db.session.add(sociodemographic_reply)

@@ -90,6 +90,7 @@ class ArticleAnnotationReply(db.Model):
     most_relevant_metric = db.Column(db.Integer, db.ForeignKey('metrics.id'), nullable=False)
     least_relevant_metric = db.Column(db.Integer, db.ForeignKey('metrics.id'), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
+    time_taken = db.Column(db.Integer, default=0, nullable=False)
     __table_args__ = (
         db.UniqueConstraint('user_id', 'corpus_article_id'),
     )
@@ -114,6 +115,7 @@ class SocioDemographicReply(db.Model):
     consumed_content = db.Column(db.String(50), default=0, nullable=False)
     news_consumption = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
+    time_taken = db.Column(db.Integer, default=0, nullable=False)
 
 
 class SocioDemographicReplySchema(ma.SQLAlchemyAutoSchema):
