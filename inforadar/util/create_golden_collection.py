@@ -7,8 +7,8 @@ def main():
         1: 30,  # hard news
         2: 30,  # opinion
         3: 30,  # soft news,
-        4: 6,  # satire
-        5: 7  # conspiracy
+        4: 6,   # satire
+        5: 13   # 7  # conspiracy
     }
 
     golden_collection = dict()
@@ -32,6 +32,24 @@ def main():
         golden_collection_set = golden_collection_set.union(ids_by_category)
     print(golden_collection_set)
     # print(len(golden_collection_set))
+
+    category_articles = {
+        5: 13   # 7  # conspiracy
+    }
+    golden_collection = dict()
+
+    for category_id, n_articles in category_articles.items():
+        corpus_articles = CorpusArticle.query \
+            .with_entities(CorpusArticle.id) \
+            .filter(CorpusArticle.category_id == category_id) \
+            .filter(func.length(CorpusArticle.body_text) < 10000) \
+            .order_by(func.random()) \
+            .limit(n_articles) \
+            .all()
+
+        golden_collection[category_id] = [article.id for article in corpus_articles]
+
+    print(golden_collection)
 
 
 if __name__ == "__main__":
