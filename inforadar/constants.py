@@ -57,6 +57,13 @@ metrics_current_version = {
     "clickbait": 1
 }
 
+article_collections = {
+    0: "default",
+    1: "mint",
+    2: "main",
+    3: "demo",
+}
+
 # Articles to be annotated
 golden_collection_by_category = {
     1: [5950, 5892, 6286, 6304, 4681, 6070, 2648, 1652, 6229, 2356, 6118, 2859, 5762, 1847, 6066, 3441, 5316, 4684,

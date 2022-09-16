@@ -8,7 +8,7 @@ from inforadar.google_token import validate_id_token
 
 from inforadar.login.user import UserManager, csrf_protection
 from inforadar.models import SocioDemographicReply, ArticleAnnotationReply
-from ..constants import golden_collection_ids
+from ..constants import golden_collection_ids, article_collections
 
 
 class Me(Resource):
@@ -39,6 +39,7 @@ class Me(Resource):
             'name': current_user.name,
             'annotator': current_user.annotator,
             'admin': current_user.admin,
+            'collection': current_user.collection,
             'sociodemographic': True if SocioDemographicReply.query.filter_by(user_id=current_user.id).first() else False,
             'annotated': n_annotated_article_ids,
             'total_to_annotate': len(golden_collection_ids),
@@ -48,6 +49,7 @@ class Me(Resource):
     def post(self):
         # Validate the identity
         id_token = request.form.get('id_token')
+        code = request.form.get('reg_code')
         if id_token is None:
             return "No ID token provided", HTTPStatus.FORBIDDEN
 
@@ -65,8 +67,11 @@ class Me(Resource):
         # will work, but you could extend the logic to do something different
         # (such as only allow known users, or somehow mark a user as new so
         # your frontend can collect extra profile information).
-        user = UserManager.add_or_get_google_user(
-            identity['sub'], identity['name'])
+        user = UserManager.get_google_user(identity['sub'])
+        if user is None:
+            email = identity['email'] if code is not None else None
+            user = UserManager.add_google_user(
+                identity['sub'], identity['name'], identity['email'], not not code, 1 if code is not None else 0)
 
         # Authorize the user:
         login_user(user, remember=True)

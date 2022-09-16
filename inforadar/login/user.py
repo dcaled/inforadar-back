@@ -8,26 +8,33 @@ from inforadar.models import User
 class UserClass(UserMixin):
     """ User class that stores ID and name and others """
 
-    def __init__(self, ident, google_id, name, annotator, admin):
+    def __init__(self, ident, google_id, name, email, annotator, collection, admin, created_at):
         self.id = ident
         self.google_id = google_id
         self.name = name
+        self.email = email
         self.annotator = annotator
+        self.collection = collection
         self.admin = admin
+        self.created_at = created_at
 
 
 # A user manager.
 class UserManager():
 
-    def add_or_get_google_user(google_subscriber_id, name):
-        """Add or update user profile info."""
+    def get_google_user(google_subscriber_id):
+        """Get user profile info."""
 
         user = User.query.filter_by(google_id=google_subscriber_id).first()
-        if user is None:
-            user = User(google_id=google_subscriber_id,
-                        name=name, annotator=False, admin=False)
-            config.db.session.add(user)
-            config.db.session.commit()
+        return UserManager.userclass_from_usermodel(user) if user else None
+
+    def add_google_user(google_subscriber_id, name, email, annotator, collection):
+        """Add user profile info."""
+
+        user = User(google_id=google_subscriber_id,
+                    name=name, email=email, annotator=annotator, collection=collection, admin=False)
+        config.db.session.add(user)
+        config.db.session.commit()
         return UserManager.userclass_from_usermodel(user)
 
     def lookup_user(user_id):
@@ -36,7 +43,7 @@ class UserManager():
         return UserManager.userclass_from_usermodel(user) if user else None
 
     def userclass_from_usermodel(usermodel):
-        return UserClass(usermodel.id, usermodel.google_id, usermodel.name, usermodel.annotator, usermodel.admin)
+        return UserClass(usermodel.id, usermodel.google_id, usermodel.name, usermodel.email, usermodel.annotator, usermodel.collection, usermodel.admin, usermodel.created_at)
 
 
 # Decorator to add CSRF protection to any mutating function.

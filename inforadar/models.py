@@ -54,8 +54,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     google_id = db.Column(db.String(255), unique=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=True)
     annotator = db.Column(db.Boolean, nullable=False)
+    collection = db.Column(db.Integer, default=0, nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=True)
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
