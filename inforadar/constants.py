@@ -61,7 +61,8 @@ article_collections = {
     0: "default",
     1: "mint",
     2: "main",
-    3: "demo",
+    3: "lusa",
+    4: "demo",
 }
 
 # Articles to be annotated
