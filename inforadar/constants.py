@@ -57,14 +57,6 @@ metrics_current_version = {
     "clickbait": 1
 }
 
-article_collections = {
-    0: "default",
-    1: "mint",
-    2: "main",
-    3: "lusa",
-    4: "demo",
-}
-
 # Articles to be annotated by journalists.
 golden_collection_by_category_journalists = {
     1: [5950, 5892, 6286, 6304, 4681, 6070, 2648, 1652, 6229, 2356, 6118, 2859, 5762, 1847, 6066, 3441, 5316, 4684,
@@ -106,3 +98,21 @@ golden_collection_ids = {12800, 13824, 16642, 13314, 5892, 11525, 6406, 257, 770
                          14464, 5762, 13698, 13954, 6286, 13975, 921, 18078, 158, 6304, 10656, 13729, 929, 10670, 10675,
                          17333, 6070, 14012, 6592, 13761, 16066, 5316, 18633, 7370, 19146, 13519, 5077, 984, 3289,
                          13276, 14302, 8429, 4590, 14574, 14318, 14063, 19701, 8696, 6905, 768, 17663}
+
+demo_ids = {11, 4000, 7000, 9000, 10000, 11000, 13000, 15000, 19002}
+
+article_collections_strings = {
+    0: "default",
+    1: "mint",
+    2: "main",
+    3: "lusa",
+    4: "demo",
+}
+
+article_collections = {
+    0: golden_collection_ids,
+    1: golden_collection_ids,
+    2: golden_collection_ids,
+    3: golden_collection_ids,
+    4: demo_ids,
+}

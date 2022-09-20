@@ -6,13 +6,15 @@ from flask_login import current_user, login_required
 from flask_restful import Resource
 from inforadar.login.user import csrf_protection
 from inforadar.models import ArticleAnnotationReply
-from ..constants import golden_collection_ids
+from ..constants import article_collections
 
 
 class ArticleAnnotation(Resource):
 
     @login_required
     def get(self):
+        user_collection_ids = article_collections[current_user.collection]
+
         annotated_articles = ArticleAnnotationReply.query \
             .filter(ArticleAnnotationReply.user_id == current_user.id) \
             .with_entities(ArticleAnnotationReply.corpus_article_id).all()
@@ -23,7 +25,7 @@ class ArticleAnnotation(Resource):
             annotated_articles_ids.add(article.corpus_article_id)
 
         # Create a set containing the ids of articles that were not annotated.
-        non_annotated_article_ids = golden_collection_ids.difference(
+        non_annotated_article_ids = user_collection_ids.difference(
             annotated_articles_ids)
         selected_article_id = random.choice(tuple(non_annotated_article_ids))
 

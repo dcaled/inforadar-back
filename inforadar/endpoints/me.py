@@ -8,7 +8,7 @@ from inforadar.google_token import validate_id_token
 
 from inforadar.login.user import UserManager, csrf_protection
 from inforadar.models import SocioDemographicReply, ArticleAnnotationReply
-from ..constants import golden_collection_ids, article_collections
+from ..constants import article_collections
 
 
 class Me(Resource):
@@ -22,6 +22,8 @@ class Me(Resource):
     @login_required
     def get(self):
 
+        user_collection_ids = article_collections[current_user.collection]
+
         annotated_articles = ArticleAnnotationReply.query \
             .filter(ArticleAnnotationReply.user_id == current_user.id) \
             .with_entities(ArticleAnnotationReply.corpus_article_id).all()
@@ -30,7 +32,7 @@ class Me(Resource):
         for article in annotated_articles:
             annotated_articles_ids.add(article.corpus_article_id)
 
-        n_annotated_article_ids = len(golden_collection_ids) - len(golden_collection_ids.difference(
+        n_annotated_article_ids = len(user_collection_ids) - len(user_collection_ids.difference(
             annotated_articles_ids))
 
         return jsonify({
@@ -42,7 +44,7 @@ class Me(Resource):
             'collection': current_user.collection,
             'sociodemographic': True if SocioDemographicReply.query.filter_by(user_id=current_user.id).first() else False,
             'annotated': n_annotated_article_ids,
-            'total_to_annotate': len(golden_collection_ids),
+            'total_to_annotate': len(user_collection_ids),
         })
 
     @csrf_protection
