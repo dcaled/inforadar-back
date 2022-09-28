@@ -14,6 +14,7 @@ from inforadar.endpoints.sociodemographic import SocioDemographic
 from inforadar.endpoints.source_checker import SourceChecker
 from inforadar.endpoints.explainable_rules import ExplainableRules
 from inforadar.endpoints.examples import Examples
+from inforadar.endpoints.user_reports import UserReports
 
 api = Api(app)
 
@@ -30,6 +31,7 @@ api.add_resource(Me, '/api2/me')
 api.add_resource(SocioDemographic, '/api2/sociodemographic')
 api.add_resource(ArticleAnnotation, '/api2/article_annotation')
 api.add_resource(CorpusArticleInfo, '/api2/corpus_article')
+api.add_resource(UserReports, '/api2/user_reports')
 
 
 if __name__ == '__main__':
