@@ -2,6 +2,7 @@ from sqlalchemy.sql import func
 from flask_login import current_user, login_required
 from flask_restful import Resource
 from inforadar.models import ArticleAnnotationReply, User
+from ..constants import article_collections_strings
 
 
 class UserReports(Resource):
@@ -28,7 +29,7 @@ class UserReports(Resource):
                 'name': user.name,
                 'articles': str(articles.sum_articles),
                 'avg_time_taken': str(articles.avg_time_taken),
-                'collection': user.collection,
+                'collection': article_collections_strings[user.collection],
             })
 
         return result, 200

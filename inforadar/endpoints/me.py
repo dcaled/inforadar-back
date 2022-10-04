@@ -8,7 +8,7 @@ from inforadar.google_token import validate_id_token
 
 from inforadar.login.user import UserManager, csrf_protection
 from inforadar.models import SocioDemographicReply, ArticleAnnotationReply
-from ..constants import article_collections
+from ..constants import article_collections, article_collections_strings
 
 
 class Me(Resource):
@@ -41,7 +41,7 @@ class Me(Resource):
             'name': current_user.name,
             'annotator': current_user.annotator,
             'admin': current_user.admin,
-            'collection': current_user.collection,
+            'collection': article_collections_strings[current_user.collection],
             'sociodemographic': True if SocioDemographicReply.query.filter_by(user_id=current_user.id).first() else False,
             'annotated': n_annotated_article_ids,
             'total_to_annotate': len(user_collection_ids),
