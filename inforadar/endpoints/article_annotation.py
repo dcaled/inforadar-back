@@ -27,6 +27,10 @@ class ArticleAnnotation(Resource):
         # Create a set containing the ids of articles that were not annotated.
         non_annotated_article_ids = user_collection_ids.difference(
             annotated_articles_ids)
+
+        if len(non_annotated_article_ids) == 0:
+            return 0
+
         selected_article_id = random.choice(tuple(non_annotated_article_ids))
 
         return selected_article_id
