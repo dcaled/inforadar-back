@@ -105,6 +105,57 @@ class ArticleAnnotationReplySchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
 
 
+class MainArticleAnnotationReply(db.Model):
+    __tablename__ = "main_article_annotation_reply"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    corpus_article_id = db.Column(db.Integer, db.ForeignKey(
+        'corpus_articles.id'), nullable=False)
+    category = db.Column(db.Integer, default=0, nullable=False)
+    category_other = db.Column(db.String(100), nullable=True)
+    credibility = db.Column(db.Integer, default=0, nullable=False)
+    representativeness = db.Column(db.Integer, default=0, nullable=False)
+    sensationalism = db.Column(db.Integer, default=0, nullable=False)
+    consistency = db.Column(db.Integer, default=0, nullable=False)
+    cites_sources = db.Column(db.Boolean, default=0, nullable=False)
+    source_credibility = db.Column(db.Integer, default=0, nullable=False)
+    time_space = db.Column(db.Integer, default=0, nullable=False)
+    objectivity = db.Column(db.Integer, default=0, nullable=False)
+    fact_opinion = db.Column(db.Integer, default=0, nullable=False)
+    accuracy = db.Column(db.Integer, nullable=True)
+    clear_viewpoint = db.Column(db.Integer, nullable=True)
+    author_conviction = db.Column(db.Integer, nullable=True)
+    unique_perspective = db.Column(db.Integer, nullable=True)
+    personal_perspective = db.Column(db.Integer, nullable=True)
+    clarity = db.Column(db.Integer, nullable=True)
+    appeal_to_fear = db.Column(db.Boolean, default=0, nullable=False)
+    appeal_to_action = db.Column(db.Boolean, default=0, nullable=False)
+    personal_attack = db.Column(db.Boolean, default=0, nullable=False)
+    sarcasm = db.Column(db.Boolean, default=0, nullable=False)
+    secret_society = db.Column(db.Boolean, default=0, nullable=False)
+    evil_forces = db.Column(db.Boolean, default=0, nullable=False)
+    threatening_truths = db.Column(db.Boolean, default=0, nullable=False)
+    us_vs_them = db.Column(db.Integer, default=0, nullable=False)
+    conspiracy_themes = db.Column(db.String(50), default=0, nullable=False)
+    conspiracy_themes_other = db.Column(db.String(100), nullable=True)
+    sentiment_polarity = db.Column(db.Integer, default=0, nullable=False)
+    sentiment_intensity = db.Column(db.Integer, default=0, nullable=False)
+    emotion = db.Column(db.String(50), default=0, nullable=False)
+    main_emotion = db.Column(db.Integer, default=0, nullable=False)
+    created_at = db.Column(
+        db.DateTime, server_default=db.func.now(), nullable=False)
+    time_taken = db.Column(db.Integer, default=0, nullable=False)
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'corpus_article_id'),
+    )
+
+
+class MainArticleAnnotationReplySchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = MainArticleAnnotationReply
+        load_instance = True
+
+
 class SocioDemographicReply(db.Model):
     __tablename__ = "sociodemographic_reply"
     id = db.Column(db.Integer, primary_key=True)
