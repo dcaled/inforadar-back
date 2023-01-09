@@ -116,3 +116,16 @@ article_collections = {
     3: golden_collection_ids,
     4: demo_ids,
 }
+
+annotation_reply = {
+    "MINT": 1,
+    "MAIN": 2,
+}
+
+article_collection_to_reply = {
+    0: annotation_reply["MINT"],
+    1: annotation_reply["MINT"],
+    2: annotation_reply["MAIN"],
+    3: annotation_reply["MINT"],
+    4: annotation_reply["MINT"],
+}
