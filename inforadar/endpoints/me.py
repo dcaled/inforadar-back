@@ -7,8 +7,8 @@ import inforadar.config as config
 from inforadar.google_token import validate_id_token
 
 from inforadar.login.user import UserManager, csrf_protection
-from inforadar.models import SocioDemographicReply, ArticleAnnotationReply
-from ..constants import article_collections, article_collections_strings
+from inforadar.models import SocioDemographicReply, ArticleAnnotationReply, MainArticleAnnotationReply
+from ..constants import article_collections, article_collections_strings, article_collection_to_reply, annotation_reply
 
 
 class Me(Resource):
@@ -22,11 +22,18 @@ class Me(Resource):
     @login_required
     def get(self):
 
+        user_annotation_reply = article_collection_to_reply[current_user.collection]
         user_collection_ids = article_collections[current_user.collection]
 
-        annotated_articles = ArticleAnnotationReply.query \
-            .filter(ArticleAnnotationReply.user_id == current_user.id) \
-            .with_entities(ArticleAnnotationReply.corpus_article_id).all()
+        annotated_articles = []
+        if (user_annotation_reply == annotation_reply["MINT"]):
+            annotated_articles = ArticleAnnotationReply.query \
+                .filter(ArticleAnnotationReply.user_id == current_user.id) \
+                .with_entities(ArticleAnnotationReply.corpus_article_id).all()
+        elif (user_annotation_reply == annotation_reply["MAIN"]):
+            annotated_articles = MainArticleAnnotationReply.query \
+                .filter(MainArticleAnnotationReply.user_id == current_user.id) \
+                .with_entities(MainArticleAnnotationReply.corpus_article_id).all()
 
         annotated_articles_ids = set()
         for article in annotated_articles:
