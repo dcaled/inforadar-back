@@ -75,7 +75,8 @@ class ArticleAnnotation(Resource):
             "sensationalism": {"type": "integer", "required": True},
             "consistency": {"type": "integer", "required": True},
             "cites_sources": {"type": "integer", "required": True},
-            "source_credibility": {"type": "integer", "required": True},
+            # ifcite_sources
+            "source_credibility": {"type": "integer"},
             "time_space": {"type": "integer", "required": True},
             "objectivity": {"type": "integer", "required": True},
             "fact_opinion": {"type": "integer", "required": True},
@@ -155,7 +156,7 @@ class ArticleAnnotation(Resource):
             sensationalism=data["sensationalism"],
             consistency=data["consistency"],
             cites_sources=data["cites_sources"],
-            source_credibility=data["source_credibility"],
+            source_credibility=data.get("source_credibility", None),
             time_space=data["time_space"],
             objectivity=data["objectivity"],
             fact_opinion=data["fact_opinion"],

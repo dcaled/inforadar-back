@@ -118,7 +118,7 @@ class MainArticleAnnotationReply(db.Model):
     sensationalism = db.Column(db.Integer, default=0, nullable=False)
     consistency = db.Column(db.Integer, default=0, nullable=False)
     cites_sources = db.Column(db.Boolean, default=0, nullable=False)
-    source_credibility = db.Column(db.Integer, default=0, nullable=False)
+    source_credibility = db.Column(db.Integer, nullable=True)
     time_space = db.Column(db.Integer, default=0, nullable=False)
     objectivity = db.Column(db.Integer, default=0, nullable=False)
     fact_opinion = db.Column(db.Integer, default=0, nullable=False)
