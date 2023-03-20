@@ -3,6 +3,7 @@ from flask_restful import Api
 from inforadar.config import app
 from inforadar.endpoints.article_annotation import ArticleAnnotation
 from inforadar.endpoints.corpus_article import CorpusArticleInfo
+from inforadar.endpoints.crowdsourced_article import CrowdsourcedArticleInfo
 from inforadar.endpoints.feedback import Feedback
 from inforadar.endpoints.histogram import Histogram
 from inforadar.endpoints.indicators import Indicators
@@ -32,6 +33,7 @@ api.add_resource(Me, '/api2/me')
 api.add_resource(SocioDemographic, '/api2/sociodemographic')
 api.add_resource(ArticleAnnotation, '/api2/article_annotation')
 api.add_resource(CorpusArticleInfo, '/api2/corpus_article')
+api.add_resource(CrowdsourcedArticleInfo, '/api2/crowdsourced_article')
 api.add_resource(UserReplies, '/api2/user_replies')
 api.add_resource(UserReports, '/api2/user_reports')
 
