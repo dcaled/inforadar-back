@@ -110,7 +110,7 @@ class MainArticleAnnotationReply(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     corpus_article_id = db.Column(db.Integer, db.ForeignKey(
-        'corpus_articles.id'), nullable=False)
+        'crowdsourced_articles.id'), nullable=False)
     category = db.Column(db.Integer, default=0, nullable=False)
     category_other = db.Column(db.String(100), nullable=True)
     credibility = db.Column(db.Integer, default=0, nullable=False)
