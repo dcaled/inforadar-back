@@ -15,9 +15,14 @@ class ArticleAnnotation(Resource):
     def get(self):
         user_collection_ids = article_collections[current_user.collection]
 
-        annotated_articles = ArticleAnnotationReply.query \
-            .filter(ArticleAnnotationReply.user_id == current_user.id) \
-            .with_entities(ArticleAnnotationReply.corpus_article_id).all()
+        user_annotation_reply = article_collection_to_reply[current_user.collection]
+
+        replyClass = ArticleAnnotationReply if user_annotation_reply == annotation_reply[
+            "MINT"] else MainArticleAnnotationReply
+
+        annotated_articles = replyClass.query \
+            .filter(replyClass.user_id == current_user.id) \
+            .with_entities(replyClass.corpus_article_id).all()
 
         annotated_articles_ids = set()
         # Add the ids of articles already annotated to a set.
