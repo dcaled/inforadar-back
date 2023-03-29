@@ -1,8 +1,8 @@
 from sqlalchemy.sql import func
 from flask_login import current_user, login_required
 from flask_restful import Resource
-from inforadar.models import ArticleAnnotationReply, User
-from ..constants import article_collections_strings
+from inforadar.models import ArticleAnnotationReply, MainArticleAnnotationReply, User
+from ..constants import article_collections_strings, article_collection_to_reply, annotation_reply
 
 
 class UserReports(Resource):
@@ -19,9 +19,14 @@ class UserReports(Resource):
 
         for user in users:
 
-            articles = ArticleAnnotationReply.query \
-                .filter(ArticleAnnotationReply.user_id == user.id) \
-                .with_entities(func.avg(ArticleAnnotationReply.time_taken).label('avg_time_taken'), func.count().label('sum_articles')).first()
+            user_annotation_reply = article_collection_to_reply[user.collection]
+
+            replyClass = ArticleAnnotationReply \
+                if user_annotation_reply == annotation_reply["MINT"] else MainArticleAnnotationReply
+
+            articles = replyClass.query \
+                .filter(replyClass.user_id == user.id) \
+                .with_entities(func.avg(replyClass.time_taken).label('avg_time_taken'), func.count().label('sum_articles')).first()
 
             result.append({
                 'id': user.id,

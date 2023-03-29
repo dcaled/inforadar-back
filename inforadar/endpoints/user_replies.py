@@ -2,7 +2,8 @@ from cerberus import Validator
 from flask import request
 from flask_login import current_user, login_required
 from flask_restful import Resource
-from inforadar.models import ArticleAnnotationReply, User
+from inforadar.models import ArticleAnnotationReply, MainArticleAnnotationReply, User
+from ..constants import article_collection_to_reply, annotation_reply
 
 
 class UserReplies(Resource):
@@ -25,11 +26,17 @@ class UserReplies(Resource):
         if not valid:
             return {"message": f"Unsupported json object: {str(validator.errors)}"}, 400
 
-        if not User.query.filter(User.id == request.args["id"]).all():
+        user = User.query.filter(User.id == request.args["id"]).all()
+        if not user:
             return {"message": "User with such ID not present."}, 400
 
-        articles = ArticleAnnotationReply.query \
-            .filter(ArticleAnnotationReply.user_id == request.args["id"]).all()
+        user_annotation_reply = article_collection_to_reply[user.collection]
+
+        replyClass = ArticleAnnotationReply \
+            if user_annotation_reply == annotation_reply["MINT"] else MainArticleAnnotationReply
+
+        articles = replyClass.query \
+            .filter(replyClass.user_id == user.id).all()
 
         result = []
 
