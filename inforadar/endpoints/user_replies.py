@@ -26,7 +26,7 @@ class UserReplies(Resource):
         if not valid:
             return {"message": f"Unsupported json object: {str(validator.errors)}"}, 400
 
-        user = User.query.filter(User.id == request.args["id"]).all()
+        user = User.query.filter(User.id == request.args["id"]).first()
         if not user:
             return {"message": "User with such ID not present."}, 400
 
