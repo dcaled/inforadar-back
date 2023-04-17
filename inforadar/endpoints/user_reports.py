@@ -13,7 +13,7 @@ class UserReports(Resource):
         if (not current_user.admin):
             return {'message': "Only accessible to admins."}, 403
 
-        users = User.query.order_by(User.id).filter(User.annotator == True)
+        users = User.query.order_by(User.id)
 
         result = []
 
@@ -32,6 +32,7 @@ class UserReports(Resource):
                 'id': user.id,
                 'email': user.email,
                 'name': user.name,
+                'annotator': user.annotator,
                 'articles': str(articles.sum_articles),
                 'avg_time_taken': str(articles.avg_time_taken),
                 'collection': article_collections_strings[user.collection],
