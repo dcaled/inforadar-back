@@ -80,7 +80,7 @@ class Me(Resource):
         if user is None:
             email = identity['email'] if code is not None else None
             user = UserManager.add_google_user(
-                identity['sub'], identity['name'], identity['email'], not not code, 1 if code is not None else 0)
+                identity['sub'], identity['name'], identity['email'], not not code, 2 if code is not None else 0)
 
         # Authorize the user:
         login_user(user, remember=True)
